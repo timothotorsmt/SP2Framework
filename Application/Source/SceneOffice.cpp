@@ -219,6 +219,22 @@ void SceneOffice::Init()
 		meshList[GEO_LIMITED_EDITION] = MeshBuilder::GenerateQuad("star", Color(1, 1, 1), 1, 1, 1);
 		meshList[GEO_LIMITED_EDITION]->textureID = LoadTGA("Image//computerUI//shopping//saleIcon.tga");
 
+		meshList[GEO_TABS] = MeshBuilder::GenerateQuad("star", Color(1, 1, 1), 1, 1, 1);
+		meshList[GEO_TABS]->textureID = LoadTGA("Image//computerUI//work//tabs.tga");
+		meshList[GEO_LOADING_BAR] = MeshBuilder::GenerateQuad("star", Color(1, 1, 1), 1, 1, 1);
+		meshList[GEO_LOADING_BAR]->textureID = LoadTGA("Image//computerUI//work//loadingBar.tga");
+
+		meshList[GEO_POPUP1] = MeshBuilder::GenerateQuad("star", Color(1, 1, 1), 1, 1, 1);
+		meshList[GEO_POPUP1]->textureID = LoadTGA("Image//computerUI//work//fake_popup_1.tga");
+		meshList[GEO_POPUP2] = MeshBuilder::GenerateQuad("star", Color(1, 1, 1), 1, 1, 1);
+		meshList[GEO_POPUP2]->textureID = LoadTGA("Image//computerUI//work//fake_popup_2.tga");
+		meshList[GEO_POPUP3] = MeshBuilder::GenerateQuad("star", Color(1, 1, 1), 1, 1, 1);
+		meshList[GEO_POPUP3]->textureID = LoadTGA("Image//computerUI//work//fake_popup_3.tga");
+
+		meshList[GEO_HAPPY_FACE] = MeshBuilder::GenerateQuad("star", Color(1, 1, 1), 1, 1, 1);
+		meshList[GEO_HAPPY_FACE]->textureID = LoadTGA("Image//computerUI//shopping//happy_face.tga");
+		meshList[GEO_ANGRY_FACE] = MeshBuilder::GenerateQuad("star", Color(1, 1, 1), 1, 1, 1);
+		meshList[GEO_ANGRY_FACE]->textureID = LoadTGA("Image//computerUI//shopping//angry_face.tga");
 	}
 
 	//others
@@ -257,6 +273,8 @@ void SceneOffice::Init()
 		meshList[GEO_SOCIALSCORE_BAR]->textureID = LoadTGA("Image//phoneUI//socialScore_bar.tga");
 		meshList[GEO_HELP_ICON] = MeshBuilder::GenerateQuad("help", Color(1, 1, 1), 1, 1, 1);
 		meshList[GEO_HELP_ICON]->textureID = LoadTGA("Image//phoneUI//help_icon.tga");
+		meshList[GEO_EXIT_ICON] = MeshBuilder::GenerateQuad("help", Color(1, 1, 1), 1, 1, 1);
+		meshList[GEO_EXIT_ICON]->textureID = LoadTGA("Image//phoneUI//exit_icon.tga");
 	}
 
 	Mtx44 projection;
@@ -283,6 +301,8 @@ void SceneOffice::Update(double dt)
 	Application::worldSpaceToScreenSpace(xpos, ypos);
 	Application::hideCursorWhenInScreen();
 
+	std::cout << xpos << " " << ypos << "\n";
+
 	if (NotificationTimer > 0) {
 		//TODO: add animation
 		NotificationTimer -= static_cast<float>(dt);
@@ -292,7 +312,7 @@ void SceneOffice::Update(double dt)
 	}
 	
 	if (hasReceivedTasks == false && NotificationTimer <= 0 && !hasClockedIn) {
-		phone->markTaskAsCompleted("Go To Work");
+		phone->markTaskAsCompleted("Go to work @ 10");
 		phone->addTaskToList("Clock In");
 		NotificationTimer = 3;
 		notif = N_TASK;
@@ -301,13 +321,10 @@ void SceneOffice::Update(double dt)
 
 	if (hasReceivedTasks == false && hasClockedIn && NotificationTimer <= 0) {
 		phone->addTaskToList("Read Emails");
-		phone->addTaskToList("Purchase HDMI cable");
 		NotificationTimer = 3;
 		notif = N_TASK;
 		hasReceivedTasks = true;
 	}
-
-	std::cout << xpos << " " << ypos << "\n";
 
 	clock->UpdateClock(dt);
 	phone->Update(float(dt));
@@ -343,8 +360,67 @@ void SceneOffice::Update(double dt)
 		mouseToggle = true;
 	}
 
+	if (hasClockedIn) {
+		workTimer += static_cast<float>(dt);
+		if (RandomiserTime <= workTimer) {
+			workTimer = 0;
+			RandomiserTime = Math::RandIntMinMax(10, 30);
+			std::size_t pos = clockTime.find(":");
+			if (std::stoi(clockTime.substr(0, pos)) >= 12 && std::stoi(clockTime.substr(pos + 1)) > 0 && phone->findInTaskList("Clock out") == false) {
+				workRandomiser = Math::RandIntMinMax(1, 4);
+			}
+			else {
+				workRandomiser = Math::RandIntMinMax(1, 3);
+			}
+			switch (workRandomiser) {
+			case 1:
+				phone->addTaskToList("Do documents");
+				notif = N_TASK;
+				NotificationTimer = 3;
+				break;
+			case 2:
+				phone->addTaskToList("Scan Files");
+				phone->addTaskToList("Print Files");
+				notif = N_TASK;
+				NotificationTimer = 3;
+				break;
+			case 3:
+				if (phone->findInTaskList("Buy new phone") == false) {
+					phone->addTaskToList("Buy new phone");
+					notif = N_TASK;
+					NotificationTimer = 3;
+				}
+				else if (phone->findInTaskList("Buy new watch") == false) {
+					phone->addTaskToList("Buy new phone");
+					notif = N_TASK;
+					NotificationTimer = 3;
+				}
+			case 4:
+				if (std::stoi(clockTime.substr(0, pos)) >= 12 && std::stoi(clockTime.substr(pos + 1)) > 0 && phone->findInTaskList("Clock out") == false) {
+					phone->addTaskToList("Clock out");
+					notif = N_TASK;
+					NotificationTimer = 3;
+				}
+			}
+		}
+	}
+
 
 	if (isUsingComputer) {
+
+		//ads
+		if (hasClockedIn && computerState != C_AD) {
+			adTimer += static_cast<float>(dt);
+			if (adTime <= adTimer) {
+				adTimer = 0;
+				adTime = Math::RandIntMinMax(10, 30);
+				adNumber = Math::RandIntMinMax(1, 3);
+				prevLocation = computerState;
+				computerState = C_AD;
+			}
+		}
+
+		//others
 		if (8 < xpos && xpos < 10 && 10 < ypos && ypos < 12) { comHoverAnimation[0] = true; }
 		else { comHoverAnimation[0] = false; }
 
@@ -359,11 +435,19 @@ void SceneOffice::Update(double dt)
 			camera.lookUp(static_cast<float>(dt));
 		}
 
-		if (computerState != C_HOME && computerState != C_CLOCKIN) {
+		if (computerState != C_HOME && computerState != C_CLOCKIN && computerState != C_AD) {
 			if (68 < xpos && xpos < 72 && 10 < ypos && ypos < 12) { comHoverAnimation[5] = true; }
 			else { comHoverAnimation[5] = false; }
 			if (68 < xpos && xpos < 72 && 10 < ypos && ypos < 12 && mouseToggle && Application::isMouseButtonPressed(0)) {
 				computerState = C_HOME;
+			}
+		}
+
+		if (isReaction) {
+			reactionTimer += static_cast<float>(dt * 3.5);
+			if (reactionTimer >= 5) {
+				reactionTimer = 0;
+				isReaction = false;
 			}
 		}
 
@@ -386,39 +470,50 @@ void SceneOffice::Update(double dt)
 			if (14 < xpos && xpos < 22 && 26 < ypos && ypos < 33 && mouseToggle && Application::isMouseButtonPressed(0)) { mouseToggle = false; computerState = C_EMAIL_EXPLAINING; workTimer = 5; }
 			if (30 < xpos && xpos < 38 && 26 < ypos && ypos < 33 && mouseToggle && Application::isMouseButtonPressed(0)) { mouseToggle = false; computerState = C_WORK; }
 			if (43 < xpos && xpos < 52 && 26 < ypos && ypos < 33 && mouseToggle && Application::isMouseButtonPressed(0)) { mouseToggle = false; computerState = C_SHOPPINGPAGE_MENU; }
+			if (60 < xpos && xpos < 68 && 26 < ypos && ypos < 33 && mouseToggle && Application::isMouseButtonPressed(0)) { mouseToggle = false; computerState = C_TASKS; }
 			break;
 		case SceneOffice::C_EMAIL:
+			if (showExplanations) {
+				if (mouseToggle && Application::isMouseButtonPressed(0)) {
+					mouseToggle = false;
+					numUnreadEmails--;
+					showExplanations = false;
+				}
+			}
+
 			if (numUnreadEmails > 0) {
-				if (14 < xpos && xpos < 33 && 14 < ypos && ypos < 21 && mouseToggle && Application::isMouseButtonPressed(0)) {
-					mouseToggle = false;
-					//if not scam email and press report
-					if (!isScamEmails[numUnreadEmails - 1]) { Player->addSocialMeter(-10); }
-					numUnreadEmails--;
-				}
-				if (45 < xpos && xpos < 64 && 14 < ypos && ypos < 21 && mouseToggle && Application::isMouseButtonPressed(0)) {
-					mouseToggle = false;
-					//if scam email and press report
-					if (isScamEmails[numUnreadEmails - 1]) { Player->addMoney(-2000); Player->addSocialMeter(-10); }
-					else {
-						Player->addSocialMeter(+10);
+				if (showExplanations == false) {
+					if (14 < xpos && xpos < 33 && 14 < ypos && ypos < 21 && mouseToggle && Application::isMouseButtonPressed(0)) {
+						mouseToggle = false;
+						//if not scam email and press report
+						if (!isScamEmails[numUnreadEmails - 1]) { isReaction = true; reactionType = 2; reactionTimer = 0; Player->addSocialMeter(-10); }
+						else {
+							isReaction = true; reactionType = 1; reactionTimer = 0;
+						}
+						showExplanations = true;
+						showStep = emails.size() - numUnreadEmails;
 					}
-					numUnreadEmails--;
-				}
-				if (numUnreadEmails == 0) {
-					phone->markTaskAsCompleted("Read Emails");
-					NotificationTimer = 3;
-					notif = N_TASK_DONE;
+					if (45 < xpos && xpos < 64 && 14 < ypos && ypos < 21 && mouseToggle && Application::isMouseButtonPressed(0)) {
+						mouseToggle = false;
+						//if scam email and press report
+						if (isScamEmails[numUnreadEmails - 1]) { isReaction = true; reactionType = 2; reactionTimer = 0; Player->addMoney(-2000); Player->moneyLostToPhishing += 2000; Player->addSocialMeter(-10); }
+						else {
+							isReaction = true; reactionType = 1; reactionTimer = 0;
+							Player->addSocialMeter(+10);
+						}
+						showExplanations = true;
+						showStep = emails.size() - numUnreadEmails;
+					}
+					if (numUnreadEmails == 0) {
+						phone->markTaskAsCompleted("Read Emails");
+						NotificationTimer = 3;
+						notif = N_TASK_DONE;
+					}
 				}
 			}
 			break;
 		case SceneOffice::C_EMAIL_EXPLAINING:
-			if (workTimer > 0) {
-				workTimer -= static_cast<float>(dt);
-			}
-			else {
-				workTimer = 0;
-				computerState = C_EMAIL;
-			}
+			computerState = C_EMAIL;
 			break;
 		case SceneOffice::C_SHOPPINGPAGE_MENU:
 			//stuff no hover animation though
@@ -428,52 +523,171 @@ void SceneOffice::Update(double dt)
 			break;
 		case SceneOffice::C_SHOPPINGPAGE:
 			if (shopList[pageCounter].first.size() >= 1) {
-				if (8 < xpos && xpos < 21 && 20 < ypos && ypos < 30 && mouseToggle && Application::isMouseButtonPressed(0)) { 
+				if (8 < xpos && xpos < 18 && 15 < ypos && ypos < 19 && mouseToggle && Application::isMouseButtonPressed(0)) { 
 					mouseToggle = false;
 					if (shopList[pageCounter].first[0].isScam) {
-						Player->addMoney(-2000);
+						isReaction = true; reactionType = 2; reactionTimer = 0;
+						Player->addMoney(-2000);  Player->moneyLostToMarket += 2000;
 					}
 					else {
+						isReaction = true; reactionType = 1; reactionTimer = 0;
 						Player->addMoney(-shopList[pageCounter].first[0].productPrice);
 					}
-					//add reaction
 				}
 			}
 			if (shopList[pageCounter].first.size() >= 2) {
-				if (24 < xpos && xpos < 37 && 20 < ypos && ypos < 30 && mouseToggle && Application::isMouseButtonPressed(0)) {
+				if (25 < xpos && xpos < 35 && 15 < ypos && ypos < 19 && mouseToggle && Application::isMouseButtonPressed(0)) {
 					mouseToggle = false;
 					if (shopList[pageCounter].first[1].isScam) {
-						Player->addMoney(-2000);
+						isReaction = true; reactionType = 2; reactionTimer = 0;
+						Player->addMoney(-2000); Player->moneyLostToMarket += 2000;
 					}
 					else {
+						isReaction = true; reactionType = 1; reactionTimer = 0;
 						Player->addMoney(-shopList[pageCounter].first[1].productPrice);
 					}
 				}
 			}
 			if (shopList[pageCounter].first.size() >= 3) {
-				if (41 < xpos && xpos < 55 && 20 < ypos && ypos < 30 && mouseToggle && Application::isMouseButtonPressed(0)) {
+				if (42 < xpos && xpos < 52 && 15 < ypos && ypos < 19 && mouseToggle && Application::isMouseButtonPressed(0)) {
 					mouseToggle = false;
 					if (shopList[pageCounter].first[2].isScam) {
-						Player->addMoney(-2000);
+						isReaction = true; reactionType = 2; reactionTimer = 0;
+						Player->addMoney(-2000); Player->moneyLostToMarket += 2000;
 					}
 					else {
+						isReaction = true; reactionType = 1; reactionTimer = 0;
 						Player->addMoney(-shopList[pageCounter].first[2].productPrice);
 					}
 				}
 			}
 			if (shopList[pageCounter].first.size() >= 4) {
-				if (58 < xpos && xpos < 72 && 20 < ypos && ypos < 30 && mouseToggle && Application::isMouseButtonPressed(0)) {
+				if (59 < xpos && xpos < 69 && 15 < ypos && ypos < 19 && mouseToggle && Application::isMouseButtonPressed(0)) {
 					mouseToggle = false;
 					if (shopList[pageCounter].first[3].isScam) {
-						Player->addMoney(-2000);
+						isReaction = true; reactionType = 2; reactionTimer = 0;
+						Player->addMoney(-2000); Player->moneyLostToMarket += 2000;
 					}
 					else {
+						isReaction = true; reactionType = 1; reactionTimer = 0;
 						Player->addMoney(-shopList[pageCounter].first[3].productPrice);
 					}
 				}
 			}
 			break;
 		case SceneOffice::C_TASKS:
+			if (39 < xpos && xpos < 41 && 34 < ypos && ypos < 35 && mouseToggle && Application::isMouseButtonPressed(0)) {
+				mouseToggle = false;
+				if (pageCounter > 0) {
+					pageCounter--;
+				}
+			}
+			if (39 < xpos && xpos < 41 && 11 < ypos && ypos < 15 && mouseToggle && Application::isMouseButtonPressed(0)) {
+				mouseToggle = false;
+				if (unsigned(pageCounter) < phone->taskList.size() - 5) {
+					pageCounter++;
+				}
+			}
+			break;
+		case SceneOffice::C_WORK:
+			if (10 < xpos && xpos < 27 && 42 < ypos && ypos < 45 && mouseToggle && Application::isMouseButtonPressed(0)) {
+				mouseToggle = false;
+				tab = 1;
+			}
+			if (32 < xpos && xpos < 49 && 42 < ypos && ypos < 45 && mouseToggle && Application::isMouseButtonPressed(0)) {
+				mouseToggle = false;
+				tab = 2;
+			}
+			if (54 < xpos && xpos < 70 && 42 < ypos && ypos < 45 && mouseToggle && Application::isMouseButtonPressed(0)) {
+				mouseToggle = false;
+				tab = 3;
+			}
+
+			switch (tab)
+			{
+			case 1:
+				if (Application::IsKeyPressed(int(TypedCharacter[0]))) {
+					TypedCharacter = char(Math::RandIntMinMax(65, 90));
+					charEnterCounter++;
+				}
+				if (charEnterCounter == 10) {
+					charEnterCounter = 0;
+					if (phone->findInTaskList("Do documents")) {
+						phone->markTaskAsCompleted("Do documents");
+						notif = N_TASK_DONE;
+						NotificationTimer = 3;
+						isReaction = true; reactionType = 1; reactionTimer = 0;
+						Player->addMoney(1000);
+						Player->addSocialMeter(5);
+					}
+					else {
+						isReaction = true; reactionType = 2; reactionTimer = 0;
+						Player->addMoney(-100);
+						Player->addSocialMeter(-5);
+					}
+				}
+				break;
+			case 2:
+				if (printerTimer > 0) {
+					printerTimer -= static_cast<float>(dt);
+				}
+				else {
+					if (hasPrinted) {
+						if (phone->findInTaskList("Print Files")) {
+							phone->markTaskAsCompleted("Print Files");
+							notif = N_TASK_DONE;
+							NotificationTimer = 3;
+							isReaction = true; reactionType = 1; reactionTimer = 0;
+							Player->addMoney(1000);
+							Player->addSocialMeter(5);
+						}
+						else {
+							isReaction = true; reactionType = 2; reactionTimer = 0;
+							Player->addMoney(-100);
+							Player->addSocialMeter(-5);
+						}
+						hasPrinted = false;
+					}
+					if (hasScanned) {
+						if (phone->findInTaskList("Scan Files")) {
+							phone->markTaskAsCompleted("Scan Files");
+							notif = N_TASK_DONE;
+							NotificationTimer = 3;
+							Player->addMoney(1000);
+						}
+						else {
+							isReaction = true; reactionType = 2;
+							Player->addMoney(-20);
+							Player->addSocialMeter(-5);
+						}
+						hasScanned = false;
+					}
+				}
+
+				if (56 < xpos && xpos < 70 && 34 < ypos && ypos < 38 && mouseToggle && Application::isMouseButtonPressed(0)) {
+					mouseToggle = false;
+					if (printerTimer <= 0) {
+						printerTimer = 5;
+						hasPrinted = true;
+					}
+				}
+
+				if (56 < xpos && xpos < 70 && 20 < ypos && ypos < 24 && mouseToggle && Application::isMouseButtonPressed(0)) {
+					mouseToggle = false;
+					if (printerTimer <= 0) {
+						printerTimer = 5;
+						hasScanned = true;
+					}
+				}
+				break;
+			case 3:
+				if (32 < xpos && xpos < 50 && 19 < ypos && ypos < 25 && mouseToggle && Application::isMouseButtonPressed(0)) {
+					goNextScene = true;
+				}
+				break;
+			default:
+				break;
+			}
 			break;
 		case SceneOffice::C_CLOCKIN:
 			if (!hasClockedIn) {
@@ -481,9 +695,11 @@ void SceneOffice::Update(double dt)
 				if (32 < xpos && xpos < 50 && 19 < ypos && ypos < 25 && mouseToggle && Application::isMouseButtonPressed(0)) {
 					std::size_t pos = clockTime.find(":");
 					if (std::stoi(clockTime.substr(0, pos)) >= 10 && std::stoi(clockTime.substr(pos + 1)) > 0) {
+						isReaction = true; reactionType = 2; reactionTimer = 0;
 						Player->addSocialMeter(-10);
 					}
 					else {
+						isReaction = true; reactionType = 1; reactionTimer = 0;
 						Player->addSocialMeter(10);
 					}
 					hasClockedIn = true;
@@ -496,14 +712,60 @@ void SceneOffice::Update(double dt)
 				computerState = C_HOME;
 			}
 			break;
+		case SceneOffice::C_AD:
+			switch (adNumber) {
+			case 1:
+				if (56 <= xpos && xpos <= 59 && 42 <= ypos && ypos <= 44 && mouseToggle && Application::isMouseButtonPressed(0)) {
+					mouseToggle = false;
+					isReaction = true; reactionType = 1; reactionTimer = 0;
+					computerState = prevLocation;
+				}
+				else if (20 <= xpos && xpos <= 58 && 14 <= ypos && ypos <= 41 && mouseToggle && Application::isMouseButtonPressed(0)) {
+					mouseToggle = false;
+					isReaction = true; reactionType = 2; reactionTimer = 0;
+					Player->addMoney(-2000); Player->moneyLostToAds += 2000;
+					computerState = prevLocation;
+				}
+				break;
+			case 2:
+				if (56 <= xpos && xpos <= 59 && 42 <= ypos && ypos <= 44 && mouseToggle && Application::isMouseButtonPressed(0)) {
+					mouseToggle = false;
+					isReaction = true; reactionType = 1; reactionTimer = 0;
+					computerState = prevLocation;
+				}
+				else if (19 <= xpos && xpos <= 59 && 15 <= ypos && ypos <= 40 && mouseToggle && Application::isMouseButtonPressed(0)) {
+					mouseToggle = false;
+					isReaction = true; reactionType = 2; reactionTimer = 0;
+					Player->addMoney(-2000); Player->moneyLostToAds += 2000;
+					computerState = prevLocation;
+				}
+				break;
+			case 3:
+				if (60 <= xpos && xpos <= 63 && 40 <= ypos && ypos <= 42 && mouseToggle && Application::isMouseButtonPressed(0)) {
+					mouseToggle = false;
+					isReaction = true; reactionType = 1; reactionTimer = 0;
+					computerState = prevLocation;
+				}
+				else if (16 <= xpos && xpos <= 63 && 19 <= ypos && ypos <= 38 && mouseToggle && Application::isMouseButtonPressed(0)) {
+					mouseToggle = false;
+					isReaction = true; reactionType = 2; reactionTimer = 0;
+					Player->addMoney(-2000); Player->moneyLostToAds += 2000;
+					computerState = prevLocation;
+				}
+				break;
+			}
+			break;
 		}
 	}
 
-	if (isPhoneOpen && isUsingComputer) {
+	if (isPhoneOpen || isUsingComputer) {
 		camera.canLookAround = false;
 	}
 	else {
 		if (0 >= xpos && xpos >= 15 && 0 >= ypos && ypos >= 15) {
+			camera.canLookAround = false;
+		}
+		else {
 			camera.canLookAround = true;
 		}
 	}
@@ -559,7 +821,7 @@ void SceneOffice::Update(double dt)
 			//mouse press things <3
 			if (50 < xpos && xpos < 60 && 30 < ypos && ypos < 40 && mouseToggle && Application::isMouseButtonPressed(0)) {
 				mouseToggle = false;
-				phoneState = P_CHATLIST;
+				phoneState = P_HELP;
 			}
 			if (60 < xpos && xpos < 70 && 30 < ypos && ypos < 40 && mouseToggle && Application::isMouseButtonPressed(0)) {
 				mouseToggle = false;
@@ -574,6 +836,10 @@ void SceneOffice::Update(double dt)
 				mouseToggle = false;
 				phoneState = P_SOCIALSCORE;
 			}
+			if (50 < xpos && xpos < 60 && 10 < ypos && ypos < 20 && mouseToggle && Application::isMouseButtonPressed(0)) {
+				mouseToggle = false;
+				goNextScene2 = true;
+			}
 			break;
 		case SceneOffice::P_CHAT:
 			break;
@@ -586,7 +852,7 @@ void SceneOffice::Update(double dt)
 					pageCounter--;
 				}
 			}
-			if (56 < xpos && xpos < 60 && 11 < ypos && ypos < 15 && mouseToggle && Application::isMouseButtonPressed(0)) {
+			if (56 < xpos && xpos < 60 && 12 < ypos && ypos < 16 && mouseToggle && Application::isMouseButtonPressed(0)) {
 				mouseToggle = false;
 				if (unsigned(pageCounter) < phone->taskList.size() - 5) {
 					pageCounter++;
@@ -601,7 +867,7 @@ void SceneOffice::Update(double dt)
 		//allow user to use computer
 		if (Application::isMouseButtonPressed(0) && mouseToggle) {
 			isUsingComputer = true;
-			camera.canLookAround = false;
+			camera.canLookAround = true;
 			computerState = C_CLOCKIN;
 			//TODO: add animation;
 			camera.position = Vector3(-55, camera.defaultPosition.y + 2, 2);
@@ -661,22 +927,22 @@ void SceneOffice::Render()
 
 		//TODO: ADD DEFAULT WALLPAPER for polish !!
 
-		if (angleBetweenComputer > 5 && angleBetweenComputer < 60 && !isPhoneOpen && !isUsingComputer) {
-			modelStack.PushMatrix();
-			modelStack.Translate(-55, 10, 14);
-			modelStack.Rotate(-30, 0, 1, 0);
-			modelStack.Scale(32, 32, 32);
-			RenderMesh(meshList[GEO_COMPUTER], enableLight);
-			modelStack.PopMatrix();
+		modelStack.PushMatrix();
+		modelStack.Translate(-55, 10, 14);
+		modelStack.Rotate(-30, 0, 1, 0);
+		modelStack.Scale(30, 30, 30);
+		RenderMesh(meshList[GEO_COMPUTER], enableLight);
+		{
+			/*modelStack.PushMatrix();
+			modelStack.Scale(0.03, 0.03, 0.03);
+			modelStack.Translate(-6, 6, 2);
+			modelStack.Scale(12, 9, 1);
+			modelStack.Rotate(10, 1, 0, 0);
+			modelStack.Rotate(180, 0, 1, 0);
+			RenderMesh(meshList[GEO_DEFAULT_WALLPAPER], true);
+			modelStack.PopMatrix();*/
 		}
-		else {
-			modelStack.PushMatrix();
-			modelStack.Translate(-55, 10, 14);
-			modelStack.Rotate(-30, 0, 1, 0);
-			modelStack.Scale(30, 30, 30);
-			RenderMesh(meshList[GEO_COMPUTER], enableLight);
-			modelStack.PopMatrix();
-		}
+		modelStack.PopMatrix();
 
 		modelStack.PushMatrix();
 		modelStack.Translate(-45, 10, 8);
@@ -929,6 +1195,18 @@ void SceneOffice::Render()
 		RenderNotifications();
 	}
 
+	//reactions
+	if (isReaction) {
+		switch (reactionType) {
+		case 1:
+			RenderImageOnScreen(meshList[GEO_HAPPY_FACE], Color(1, 1, 1), 5, 5, static_cast<float>(xpos) + 0.5f, static_cast<float>(ypos + reactionTimer));
+			break;
+		case 2:
+			RenderImageOnScreen(meshList[GEO_ANGRY_FACE], Color(1, 1, 1), 5, 5, static_cast<float>(xpos) + 0.5f, static_cast<float>(ypos + reactionTimer));
+			break;
+		}
+	}
+
 	//render cursor last because it has to show up on top
 	{
 		modelStack.PushMatrix();
@@ -1059,16 +1337,16 @@ void SceneOffice::RenderPhoneUI()
 	switch (phoneState)
 	{
 	case SceneOffice::P_HOME:
-		if (hoverAnimation[3]) { RenderImageOnScreen(meshList[GEO_CHAT_ICON], Color(1, 1, 1), 9, 9, 55, 35, 0, 20); }
-		else { RenderImageOnScreen(meshList[GEO_CHAT_ICON], Color(1, 1, 1), 8, 8, 55, 35, 0, 0); }
+		if (hoverAnimation[3]) { RenderImageOnScreen(meshList[GEO_HELP_ICON], Color(1, 1, 1), 9, 9, 55, 35, 0, 20); }
+		else { RenderImageOnScreen(meshList[GEO_HELP_ICON], Color(1, 1, 1), 8, 8, 55, 35, 0, 0); }
 		if (hoverAnimation[4]) { RenderImageOnScreen(meshList[GEO_TASKS_ICON], Color(1, 1, 1), 9, 9, 65, 35, 0, 20); }
 		else { RenderImageOnScreen(meshList[GEO_TASKS_ICON], Color(1, 1, 1), 8, 8, 65, 35, 0, 0); }
 		if (hoverAnimation[5]) { RenderImageOnScreen(meshList[GEO_MONEY_ICON], Color(1, 1, 1), 9, 9, 55, 25, 0, 20); }
 		else { RenderImageOnScreen(meshList[GEO_MONEY_ICON], Color(1, 1, 1), 8, 8, 55, 25, 0, 0); }
 		if (hoverAnimation[6]) { RenderImageOnScreen(meshList[GEO_SOCIALSCORE_ICON], Color(1, 1, 1), 9, 9, 65, 25, 0, 20); }
 		else { RenderImageOnScreen(meshList[GEO_SOCIALSCORE_ICON], Color(1, 1, 1), 8, 8, 65, 25, 0, 0); }
-		if (hoverAnimation[7]) { RenderImageOnScreen(meshList[GEO_HELP_ICON], Color(1, 1, 1), 9, 9, 55, 15, 0, 20); }
-		else { RenderImageOnScreen(meshList[GEO_HELP_ICON], Color(1, 1, 1), 8, 8, 55, 15, 0, 0); }
+		if (hoverAnimation[7]) { RenderImageOnScreen(meshList[GEO_EXIT_ICON], Color(1, 1, 1), 9, 9, 55, 15, 0, 20); }
+		else { RenderImageOnScreen(meshList[GEO_EXIT_ICON], Color(1, 1, 1), 8, 8, 55, 15, 0, 0); }
 
 		RenderTextOnScreen(meshList[GEO_TEXT], "my phone <3", Color(0.6f, 0.3f, 0.3f), 3, 52, 41);
 		break;
@@ -1175,7 +1453,7 @@ void SceneOffice::RenderComputerUI()
 	else {
 		RenderImageOnScreen(meshList[GEO_POWER_BUTTON], Color(1, 1, 1), 3, 3, 10, 12);
 	}
-	if (computerState != C_HOME && computerState != C_CLOCKIN) {
+	if (computerState != C_HOME && computerState != C_CLOCKIN && computerState != C_AD) {
 		if (comHoverAnimation[5]) {
 			RenderImageOnScreen(meshList[GEO_HOME_ICON], Color(1, 1, 1), 6, 6, 70, 12, 0, 20);
 		}
@@ -1229,6 +1507,42 @@ void SceneOffice::RenderComputerUI()
 			RenderTextOnScreen(meshList[GEO_TEXT], "NO MORE UNREAD EMAILS", Color(0.6f, 0.3f, 0.3f), 3, 20, 30);
 		}
 		else {
+
+			if (showExplanations) {
+				switch (showStep)
+				{
+				case 0:
+					//not scam lol
+					RenderImageOnScreen(meshList[GEO_SOCIALSCORE_BAR], Color(1, 1, 1), 26, 2, 33, 39);
+					RenderTextOnScreen(meshList[GEO_TEXT], "Reliable Sender", Color(0.3f, 0.6f, 0.3f), 2.5f, 36, 40);
+
+					break;
+				case 1:
+					RenderImageOnScreen(meshList[GEO_SOCIALSCORE_BAR], Color(1, 1, 1), 28, 2, 33, 39);
+					RenderTextOnScreen(meshList[GEO_TEXT], "Unreliable Sender", Color(0.3f, 0.6f, 0.3f), 2.5f, 42, 41);
+					break;
+				case 2:
+					RenderImageOnScreen(meshList[GEO_SOCIALSCORE_BAR], Color(1, 1, 1), 14, 2, 46, 39);
+					RenderImageOnScreen(meshList[GEO_SOCIALSCORE_BAR], Color(1, 1, 1), 21, 3, 30, 41);
+					RenderTextOnScreen(meshList[GEO_TEXT], "Mismatched", Color(0.3f, 0.6f, 0.3f), 2.5f, 45, 42);
+					RenderTextOnScreen(meshList[GEO_TEXT], "Organisations", Color(0.3f, 0.6f, 0.3f), 2.5f, 45, 40);
+					break;
+				case 3:
+					RenderImageOnScreen(meshList[GEO_SOCIALSCORE_BAR], Color(1, 1, 1), 56, 5, 40, 32);
+					RenderTextOnScreen(meshList[GEO_TEXT], "No reason provided", Color(0.3f, 0.6f, 0.3f), 2.5f, 30, 35);
+					break;
+				case 4:
+					RenderImageOnScreen(meshList[GEO_SOCIALSCORE_BAR], Color(1, 1, 1), 20, 3, 25, 30);
+					RenderTextOnScreen(meshList[GEO_TEXT], "Grammar errors", Color(0.3f, 0.6f, 0.3f), 2.5f, 30, 35);
+					break;
+				case 5:
+
+					break;
+				default:
+					break;
+				}
+			}
+
 			std::size_t pos = emails[numUnreadEmails - 1].second.find("(");
 			RenderTextOnScreen(meshList[GEO_TEXT], emails[numUnreadEmails - 1].second.substr(0, pos - 1), Color(0.6f, 0.3f, 0.3f), 3, 20, 40);
 			RenderTextOnScreen(meshList[GEO_TEXT], emails[numUnreadEmails - 1].second.substr(pos), Color(0.6f, 0.3f, 0.3f), 2.5f, 20, 38);
@@ -1239,7 +1553,7 @@ void SceneOffice::RenderComputerUI()
 			}
 
 			//render buttons
-			if (14 < xpos && xpos < 33 && 14 < ypos && ypos < 21 && Application::isMouseButtonPressed(0)) {
+			if (14 < xpos && xpos < 33 && 14 < ypos && ypos < 21 && Application::isMouseButtonPressed(0) && showExplanations == false) {
 				RenderImageOnScreen(meshList[GEO_BUTTON_PRESSED], Color(1, 1, 1), 20, 7, 25, 18);
 				RenderTextOnScreen(meshList[GEO_TEXT], "REPORT", Color(1, 1, 1), 3.5f, 18, 15);
 			}
@@ -1247,7 +1561,7 @@ void SceneOffice::RenderComputerUI()
 				RenderImageOnScreen(meshList[GEO_BUTTON_NOT_PRESSED], Color(1, 1, 1), 20, 7, 25, 18);
 				RenderTextOnScreen(meshList[GEO_TEXT], "REPORT", Color(1, 1, 1), 3.5f, 18, 17);
 			}
-			if (45 < xpos && xpos < 64 && 14 < ypos && ypos < 21 && Application::isMouseButtonPressed(0)) {
+			if (45 < xpos && xpos < 64 && 14 < ypos && ypos < 21 && Application::isMouseButtonPressed(0) && showExplanations == false) {
 				RenderImageOnScreen(meshList[GEO_BUTTON_PRESSED], Color(1, 1, 1), 20, 7, 55, 18);
 				RenderTextOnScreen(meshList[GEO_TEXT], "TAKE ACTION", Color(1, 1, 1), 3, 46, 15);
 			}
@@ -1279,20 +1593,86 @@ void SceneOffice::RenderComputerUI()
 				break;
 			}
 			if (shopList[pageCounter].first[i].hasPicture) {
-				RenderImageOnScreen(tempMesh, Color(1, 1, 1), 15, 15, 15 + (i * 17), 27);
+				RenderImageOnScreen(tempMesh, Color(1, 1, 1), 15, 15, 15 + static_cast<float>(i * 17), 27);
 			}
 			else {
-				RenderImageOnScreen(meshList[GEO_ITEM_NOIMAGE], Color(1, 1, 1), 15, 15, 15 + (i * 17), 27);
+				RenderImageOnScreen(meshList[GEO_ITEM_NOIMAGE], Color(1, 1, 1), 15, 15, 15 + static_cast<float>(i * 17), 27);
 			}
-			RenderTextOnScreen(meshList[GEO_TEXT], std::to_string(shopList[pageCounter].first[i].productPrice) + ".00", Color(0.6f, 0.3f, 0.3f), 2, 16 + (i * 17), 29);
-			RenderTextOnScreen(meshList[GEO_TEXT], shopList[pageCounter].first[i].productName, Color(0.6f, 0.3f, 0.3f), 1.5f, 9 + (i * 17), 24);
+			RenderTextOnScreen(meshList[GEO_TEXT], std::to_string(shopList[pageCounter].first[i].productPrice) + ".00", Color(0.6f, 0.3f, 0.3f), 2, 16 + static_cast<float>(i * 17), 29);
+			RenderTextOnScreen(meshList[GEO_TEXT], shopList[pageCounter].first[i].productName, Color(0.6f, 0.3f, 0.3f), 1.5f, 9 + static_cast<float>(i * 17), 24);
 			if (shopList[pageCounter].first[i].isLimitedEdition) {
-				RenderImageOnScreen(meshList[GEO_LIMITED_EDITION], Color(1, 1, 1), 3, 3, 20 + (i * 17), 18);
+				RenderImageOnScreen(meshList[GEO_LIMITED_EDITION], Color(1, 1, 1), 3, 3, 21 + static_cast<float>(i * 17), 18);
 			}
 			for (int j = 0; j < shopList[pageCounter].first[i].reviewStars; j++) {
-				RenderImageOnScreen(meshList[GEO_STAR], Color(1, 1, 1), 1.5f, 1.5f, 10 + (i * 17) + (j * 2.5f), 22);
+				RenderImageOnScreen(meshList[GEO_STAR], Color(1, 1, 1), 1.5f, 1.5f, 10 + static_cast<float>(i * 17) + static_cast<float>(j * 2.5f), 22);
+			}
+			if (8 + (static_cast<float>(i) * 17) < xpos && xpos < 18 + (static_cast<float>(i) * 17) && 15 < ypos && ypos < 19 && Application::isMouseButtonPressed(0)) {
+				RenderImageOnScreen(meshList[GEO_BUTTON_PRESSED], Color(1, 1, 1), 10, 4, 13 + static_cast<float>(i * 17), 17);
+				RenderTextOnScreen(meshList[GEO_TEXT], "buy", Color(1, 1, 1), 3, 10.5f + static_cast<float>(i * 17), 15);
+
+			}
+			else {
+				RenderImageOnScreen(meshList[GEO_BUTTON_NOT_PRESSED], Color(1, 1, 1), 10, 4, 13 + static_cast<float>(i * 17), 17);
+				RenderTextOnScreen(meshList[GEO_TEXT], "buy", Color(1, 1, 1), 3, 10.5f + static_cast<float>(i * 17), 16);
+
 			}
 			
+		}
+		break;
+	case SceneOffice::C_WORK:
+		RenderImageOnScreen(meshList[GEO_TABS], Color(1, 1, 1), 20, 6, 19, 44);
+		RenderImageOnScreen(meshList[GEO_TABS], Color(1, 1, 1), 20, 6, 41, 44);
+		RenderImageOnScreen(meshList[GEO_TABS], Color(1, 1, 1), 20, 6, 63, 44);
+		RenderTextOnScreen(meshList[GEO_TEXT], "Documents", Color(0.6f, 0.3f, 0.3f), 3, 12, 42.5f);
+		RenderTextOnScreen(meshList[GEO_TEXT], "Printer", Color(0.6f, 0.3f, 0.3f), 3, 36, 42.5f);
+		RenderTextOnScreen(meshList[GEO_TEXT], "Clock out", Color(0.6f, 0.3f, 0.3f), 3, 57, 42.5f);
+		RenderTextOnScreen(meshList[GEO_TEXT], "Reminder: Only do what you're told.", Color(0.6f, 0.3f, 0.3f), 3, 15, 12);
+
+		switch (tab) {
+		case 1:
+			RenderTextOnScreen(meshList[GEO_TEXT], "Type the letter seen below", Color(0.6f, 0.3f, 0.3f), 3, 12, 37);
+			RenderTextOnScreen(meshList[GEO_TEXT], TypedCharacter, Color(0.6f, 0.3f, 0.3f), 20, 35, 20);
+			RenderImageOnScreen(meshList[GEO_SOCIALSCORE_BAR], Color(1, 1, 1), static_cast<float>(charEnterCounter) * 2, 6, 44 - static_cast<float>(10 - charEnterCounter), 19);
+			RenderTextOnScreen(meshList[GEO_TEXT], "% done:", Color(0.6f, 0.3f, 0.3f), 3, 20, 17);
+			RenderImageOnScreen(meshList[GEO_LOADING_BAR], Color(1, 1, 1), 20, 6, 44, 19);
+			break;
+		case 2:
+			RenderTextOnScreen(meshList[GEO_TEXT], "PRINT DOCUMENTS", Color(0.6f, 0.3f, 0.3f), 3, 12, 34);
+			RenderTextOnScreen(meshList[GEO_TEXT], "SCAN DOCUMENTS", Color(0.6f, 0.3f, 0.3f), 3, 12, 20);
+			if (56 < xpos && xpos < 70 && 34 < ypos && ypos < 38 && Application::isMouseButtonPressed(0)) {
+				RenderImageOnScreen(meshList[GEO_BUTTON_PRESSED], Color(1, 1, 1), 14, 5, 63, 36);
+			}
+			else {
+				RenderImageOnScreen(meshList[GEO_BUTTON_NOT_PRESSED], Color(1, 1, 1), 14, 5, 63, 36);
+			}
+			if (hasPrinted) {
+				RenderImageOnScreen(meshList[GEO_SOCIALSCORE_BAR], Color(1, 1, 1), (printerTimer) * 12, 3, 41 - (5 - printerTimer) * 6, 32);
+			}
+			RenderImageOnScreen(meshList[GEO_LOADING_BAR], Color(1, 1, 1), 60, 3, 41, 32);
+
+			if (56 < xpos && xpos < 70 && 20 < ypos && ypos < 24 && Application::isMouseButtonPressed(0)) {
+				RenderImageOnScreen(meshList[GEO_BUTTON_PRESSED], Color(1, 1, 1), 14, 5, 63, 22);
+			}
+			else {
+				RenderImageOnScreen(meshList[GEO_BUTTON_NOT_PRESSED], Color(1, 1, 1), 14, 5, 63, 22);
+			}
+			if (hasScanned) {
+				RenderImageOnScreen(meshList[GEO_SOCIALSCORE_BAR], Color(1, 1, 1), (printerTimer) * 12, 3, 41 - (5 - printerTimer) * 6, 18);
+			}
+			RenderImageOnScreen(meshList[GEO_LOADING_BAR], Color(1, 1, 1), 60, 3, 41, 18);
+			break;
+		case 3:
+			RenderTextOnScreen(meshList[GEO_TEXT], "Finish the work day?", Color(0.6f, 0.3f, 0.3f), 4, 26, 34);
+			RenderTextOnScreen(meshList[GEO_TEXT], "This cannot be undone.", Color(0.6f, 0.3f, 0.3f), 3, 28, 31);
+			if (32 < xpos && xpos < 50 && 19 < ypos && ypos < 25 && Application::isMouseButtonPressed(0)) {
+				RenderImageOnScreen(meshList[GEO_BUTTON_PRESSED], Color(1, 1, 1), 20, 7, 42, 23);
+				RenderTextOnScreen(meshList[GEO_TEXT], "CLOCK OUT", Color(1, 1, 1), 3.5f, 33.5f, 20);
+			}
+			else {
+				RenderImageOnScreen(meshList[GEO_BUTTON_NOT_PRESSED], Color(1, 1, 1), 20, 7, 42, 23);
+				RenderTextOnScreen(meshList[GEO_TEXT], "CLOCK OUT", Color(1, 1, 1), 3.5f, 33.5f, 22);
+			}
+			break;
 		}
 		break;
 	case SceneOffice::C_CLOCKIN:
@@ -1317,6 +1697,60 @@ void SceneOffice::RenderComputerUI()
 		RenderTextOnScreen(meshList[GEO_TEXT], "Hint: watch out for any inconsistencies in the email", Color(0.5f, 0.5f, 0.5f), 2.5f, 12, 20);
 		RenderTextOnScreen(meshList[GEO_TEXT], "as well as be vigilant for any impersonation.", Color(0.5f, 0.5f, 0.5f), 2.5f, 12, 17);
 		break;
+	case SceneOffice::C_AD:
+		switch (adNumber) {
+		case 1:
+			RenderImageOnScreen(meshList[GEO_POPUP1], Color(1, 1, 1), 40, 32, 40, 30);
+			break;
+		case 2:
+			RenderImageOnScreen(meshList[GEO_POPUP2], Color(1, 1, 1), 41, 30, 40, 30);
+			break;
+		case 3:
+			RenderImageOnScreen(meshList[GEO_POPUP3], Color(1, 1, 1), 50, 26, 40, 30);
+			break;
+		}
+		break;
+	case SceneOffice::C_TASKS:
+		RenderTextOnScreen(meshList[GEO_TEXT], "TO DO: ", Color(0.6f, 0.3f, 0.3f), 4, 36, 40);
+		RenderTextOnScreen(meshList[GEO_TEXT], "^", Color(0.6f, 0.3f, 0.3f), 4, 40, 33);
+		RenderTextOnScreen(meshList[GEO_TEXT], "v", Color(0.6f, 0.3f, 0.3f), 4, 40, 13);
+		if (static_cast<int>(phone->taskList.size()) - 1 - pageCounter > 0) {
+			if (!phone->taskList[static_cast<int>(phone->taskList.size()) - 1 - pageCounter].isCompleted) { RenderTextOnScreen(meshList[GEO_TEXT], "-", Color(0.6f, 0.3f, 0.3f), 3, 25, 30); RenderTextOnScreen(meshList[GEO_TEXT], phone->taskList[static_cast<int>(phone->taskList.size()) - 1 - pageCounter].taskName, Color(0.6f, 0.3f, 0.3f), 3, 30, 30); }
+			else {
+				RenderTextOnScreen(meshList[GEO_TEXT], "-", Color(0.5f, 0.5f, 0.5f), 3, 25, 30);
+				RenderTextOnScreen(meshList[GEO_TEXT], phone->taskList[phone->taskList.size() - 1 - int(pageCounter)].taskName, Color(0.5f, 0.5f, 0.5f), 3, 30, 30);
+			}
+		}
+		if (static_cast<int>(phone->taskList.size()) - 2 - pageCounter > 0) {
+			if (!phone->taskList[static_cast<int>(phone->taskList.size()) - 2 - pageCounter].isCompleted) { RenderTextOnScreen(meshList[GEO_TEXT], "-", Color(0.6f, 0.3f, 0.3f), 3, 25, 27); RenderTextOnScreen(meshList[GEO_TEXT], phone->taskList[static_cast<int>(phone->taskList.size()) - 2 - pageCounter].taskName, Color(0.6f, 0.3f, 0.3f), 3, 30, 27); }
+			else {
+				RenderTextOnScreen(meshList[GEO_TEXT], "-", Color(0.5f, 0.5f, 0.5f), 3, 25, 27);
+				RenderTextOnScreen(meshList[GEO_TEXT], phone->taskList[static_cast<int>(phone->taskList.size()) - 2 - pageCounter].taskName, Color(0.5f, 0.5f, 0.5f), 3, 30, 27);
+			}
+		}
+		if (static_cast<int>(phone->taskList.size()) - 3 - pageCounter > 0) {
+			if (!phone->taskList[static_cast<int>(phone->taskList.size()) - 3 - pageCounter].isCompleted) { RenderTextOnScreen(meshList[GEO_TEXT], "-", Color(0.6f, 0.3f, 0.3f), 3, 25, 24); RenderTextOnScreen(meshList[GEO_TEXT], phone->taskList[static_cast<int>(phone->taskList.size()) - 3 - pageCounter].taskName, Color(0.6f, 0.3f, 0.3f), 3, 30, 24); }
+			else {
+				RenderTextOnScreen(meshList[GEO_TEXT], "-", Color(0.5f, 0.5f, 0.5f), 3, 25, 24);
+				RenderTextOnScreen(meshList[GEO_TEXT], phone->taskList[static_cast<int>(phone->taskList.size()) - 3 - pageCounter].taskName, Color(0.5f, 0.5f, 0.5f), 3, 30, 24);
+			}
+		}
+		if (static_cast<int>(phone->taskList.size()) - 4 - pageCounter > 0) {
+			if (!phone->taskList[static_cast<int>(phone->taskList.size()) - 4 - pageCounter].isCompleted) { RenderTextOnScreen(meshList[GEO_TEXT], "-", Color(0.6f, 0.3f, 0.3f), 3, 25, 21); RenderTextOnScreen(meshList[GEO_TEXT], phone->taskList[static_cast<int>(phone->taskList.size()) - 4 - pageCounter].taskName, Color(0.6f, 0.3f, 0.3f), 3, 30, 21); }
+			else {
+				RenderTextOnScreen(meshList[GEO_TEXT], "-", Color(0.5f, 0.5f, 0.5f), 3, 25, 21);
+				RenderTextOnScreen(meshList[GEO_TEXT], phone->taskList[static_cast<int>(phone->taskList.size()) - 4 - pageCounter].taskName, Color(0.5f, 0.5f, 0.5f), 3, 30, 21);
+			}
+		}
+		if (static_cast<int>(phone->taskList.size()) - 5 - pageCounter > 0) {
+			if (!phone->taskList[static_cast<int>(phone->taskList.size()) - 5 - pageCounter].isCompleted) { RenderTextOnScreen(meshList[GEO_TEXT], "-", Color(0.6f, 0.3f, 0.3f), 3, 25, 18); RenderTextOnScreen(meshList[GEO_TEXT], phone->taskList[static_cast<int>(phone->taskList.size()) - 5 - pageCounter].taskName, Color(0.6f, 0.3f, 0.3f), 3, 50, 18); }
+			else {
+				RenderTextOnScreen(meshList[GEO_TEXT], "-", Color(0.5f, 0.5f, 0.5f), 3, 25, 18);
+				RenderTextOnScreen(meshList[GEO_TEXT], phone->taskList[static_cast<int>(phone->taskList.size()) - 5 - pageCounter].taskName, Color(0.5f, 0.5f, 0.5f), 3, 30, 18);
+			}
+		}
+
+		break;
 	}
 
 	RenderTextOnScreen(meshList[GEO_TEXT], clockTime, Color(0.6f, 0.3f, 0.3f), 2, 38, 47);
@@ -1332,7 +1766,7 @@ void SceneOffice::RenderNotifications()
 	case SceneOffice::N_TASK:
 		RenderImageOnScreen(meshList[GEO_TASKS_ICON], Color(1, 1, 1), 6, 6, 45, 7);
 		RenderTextOnScreen(meshList[GEO_TEXT], "New Task Available", Color(0.6f, 0.3f, 0.3f), 3, 49, 7);
-		RenderTextOnScreen(meshList[GEO_TEXT], "Check your phone for more details", Color(0.6f, 0.3f, 0.3f), 2
+		RenderTextOnScreen(meshList[GEO_TEXT], phone->taskList[phone->taskList.size() - 1 - int(pageCounter)].taskName, Color(0.6f, 0.3f, 0.3f), 2
 			, 49, 5);
 		break;
 	case SceneOffice::N_TASK_DONE:
