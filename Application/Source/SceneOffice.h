@@ -1,5 +1,5 @@
-#ifndef SCENE_OFFICE_H
-#define SCENE_OFFICE_H
+#ifndef SCENE_CITY_H
+#define SCENE_CITY_H
 
 #include "Scene.h"
 #include "FirstPersonCamera.h"
@@ -12,24 +12,11 @@
 #include "Material.h"
 #include "clock.h"
 #include "player.h"
-#include <utility>
-#include <string>
-#include <vector>
-#include <tuple>
 
 #define SKYBOXSIZE 1000
 #define PLAYERSPEED 2.0f
 
-struct products {
-	bool hasPicture;
-	bool isLimitedEdition;
-	int reviewStars;
-	std::string productName;
-	int productPrice;
-	bool isScam;
-};
-
-class SceneOffice : public Scene
+class SceneCity : public Scene
 {
 	enum GEOMETRY_TYPE {
 		GEO_AXES,
@@ -39,19 +26,8 @@ class SceneOffice : public Scene
 		GEO_DIALOG_BOX,
 		GEO_TEMP_QUAD,
 
-		//skybox and lightball
-		GEO_LIGHTBALL,
-		GEO_FRONT,
-		GEO_BACK,
-		GEO_LEFT,
-		GEO_RIGHT,
-		GEO_TOP,
-		GEO_BOTTOM,
-
 		//otherUI
 		GEO_WATCH,
-		GEO_HAPPY_FACE,
-		GEO_ANGRY_FACE,
 
 		//phone ui
 		GEO_NOTIF_BOX,
@@ -66,38 +42,70 @@ class SceneOffice : public Scene
 		GEO_TASKS_ICON,
 		GEO_HELP_ICON,
 		GEO_SETTINGS_ICON,
+		GEO_EXIT_ICON,
 
-		//computer UI,
-		GEO_DEFAULT_WALLPAPER,
-		GEO_POWER_BUTTON,
-		GEO_EMAIL_ICON,
-		GEO_SHOPPING_ICON,
-		GEO_WORK_ICON,
-		GEO_USER_ICON,
+		//skybox and lightball
+		GEO_LIGHTBALL,
+		GEO_FRONT,
+		GEO_BACK,
+		GEO_LEFT,
+		GEO_RIGHT,
+		GEO_TOP,
+		GEO_BOTTOM,
+
+		//city scene
+		GEO_HOUSE1,
+		GEO_ROAD,
+		GEO_HOUSE2,
+		GEO_HOUSE5,
+		GEO_BIGHOUSE,
+		GEO_GRASS,
+		GEO_FENCE,
+		GEO_CROSSWALK,
+		GEO_HOUSE3,
+		GEO_HOUSE4,
+		GEO_TREE,
+		GEO_BIGTREE,
+		GEO_CURVE,
+		GEO_SKYSCRAPER,
+		GEO_SKYSCRAPER2,
+		GEO_SKYSCRAPER3,
+		GEO_SKYSCRAPER4,
+		GEO_SKYSCRAPER5,
+		GEO_SKYSCRAPER6,
+		GEO_SKYSCRAPER7,
+		GEO_HOUSECAR,
+
+		GEO_BIGAPARTMENT,
+		GEO_BIGAPARTMENT2,
+		GEO_BIGAPARTMENT3,
+
+		GEO_CONDO,
+		GEO_CONDO2,
+
+		//vehicles
+		GEO_CAR,
+		GEO_AMBULANCE,
+		GEO_VAN,
+		GEO_TAXI,
+		GEO_FIRETRUCK,
+		GEO_POLICE,
+
+		//characters
+		GEO_CHARITY,
 		GEO_BUTTON_PRESSED,
 		GEO_BUTTON_NOT_PRESSED,
 
-		//shopping thing UI
-		GEO_SHOP_LOGO,
-		GEO_SHOP_MENU,
-		GEO_ITEM_NOIMAGE,
-		GEO_ITEM_PHONE,
-		GEO_ITEM_WATCH,
-		GEO_ITEM_CABLE,
-		GEO_STAR,
-		GEO_LIMITED_EDITION,
+		//far away buildings
+		GEO_FARBUILDING,
+		GEO_FARBUILDING2,
+		GEO_FARBUILDING3,
+		GEO_FARBUILDING4,
+		//GEO_FARBUILDING5,
 
-		//office items
-		GEO_OFFICETABLE,
-		GEO_COMPUTER,
-		GEO_KEYBOARD,
-		GEO_OFFICECHAIR,
-		GEO_PLANT1,
-		GEO_PLANT2,
-		GEO_OFFICEDOOR,
-		GEO_BOOKS,
-		GEO_WALL,
-		GEO_OFFICEFLOOR,
+		GEO_MARKER,
+
+		GEO_BUILDING,//hospital
 
 		NUM_GEOMETRY,
 	};
@@ -152,33 +160,29 @@ class SceneOffice : public Scene
 		P_MONEY,
 		P_SOCIALSCORE,
 		P_HELP,
-		P_TASKS
+		P_TASKS,
+		P_QUIT
 	};
 
-	enum computerScreen {
-		C_COMOFF,
-		C_LOADING,
-		C_HOME,
-		C_EMAIL,
-		C_EMAIL_EXPLAINING,
-		C_SHOPPINGPAGE_MENU,
-		C_SHOPPINGPAGE,
-		C_CLOCKIN,
-		C_TASKS,
-		C_WORK
+	enum Dialogue {
+		D_OFF,
+		D_CHAR_DIALOGUE_1,
+		D_CHAR_DIALOGUE_2,
+		D_CHAR_DIALOGUE_3,
+		D_CHAR_DIALOGUE_4,
+		D_CHAR_DIALOGUE_5,
 	};
 
 	enum Notification {
 		N_OFF,
 		N_CHAT,
 		N_TASK,
-		N_TASK_DONE,
 		N_WORK
 	};
 
 public:
-	SceneOffice();
-	~SceneOffice();
+	SceneCity();
+	~SceneCity();
 
 	void Init();
 	void TransferGameInfo(Game* game);
@@ -195,14 +199,13 @@ private:
 	FirstPersonCamera camera;
 	MS modelStack, viewStack, projectionStack;
 	Light light[5];
-	Notification notifs = Notification::N_OFF;
 
 	//functions to render things
 	void RenderMesh(Mesh* mesh, bool enableLight);
 	void RenderSkybox();
 	void RenderPhoneUI();
-	void RenderComputerUI();
 	void RenderNotifications();
+	void RenderSpeechBox();
 	void RenderText(Mesh* mesh, std::string text, Color color);
 
 	//use screen points
@@ -211,9 +214,20 @@ private:
 	std::vector<float> getNumberValues(std::string filename);
 	std::vector<float> fontData;
 
+	//distances from characters
+	bool isDialogue = false;
+	Dialogue speech;
+	float distanceFromCharacter1 = 0;
+	float distanceFromCharacter2 = 0;
+	std::string charTalk1;
+	std::string charTalk2;
+	std::string speakerName;
+
+	double xpos, ypos;
 	bool enableLight;
 	bool keyToggle;
 	bool mouseToggle;
+	Notification notifs;
 
 	//in-game stuff
 	Clock* clock;
@@ -221,39 +235,23 @@ private:
 	Phone* phone;
 	std::string clockTime = "";
 	int money = int(DEFAULTMONEY), socialMeter = int(DEFAULTSOCIALMETER);
-	double xpos, ypos;
-	float NotificationTimer = 2;
-	bool hasReceivedTasks = false;
-	int taskNumber = 1;
-	Notification notif;
 
 	//phone ??
 	PhoneScreen phoneState;
 	int taskCount, chatCount;
-	bool isPhoneOpen = false;
+	bool isPhoneOpen;
+	float NotificationTimer = 5;
 	bool hoverAnimation[9] = { false, false, false, false, false, false, false, false, false };
-	//just a general page counter
+	//task list
 	int pageCounter;
+	int taskNumber = 2;
 
-	//work computer 
-	float angleBetweenComputer = 0;
-	bool isUsingComputer;
-	bool comHoverAnimation[6] = { false, false, false, false, false, false };
-	//TODO: if there's time make the emails into a struct thanks
-	std::vector<bool> isScamEmails;
-	std::vector<std::pair<std::vector<std::string>, std::string>> emails;
-	void initialiseEmails(std::string textFile);
-	int numUnreadEmails;
-	computerScreen computerState;
-	float workTimer = 0;
-	int workTasksLeft = 10;
-	bool hasClockedIn = false;
-
-	//shopping game
-	int moneySpent = 0;
-	std::vector<std::pair<std::vector<products>, std::string>> shopList;
-	void initialiseShop(std::string textFile);
+	//city
+	bool hasEnteredOffice = false;
+	float distanceToOffice = 0;
 };
+
+
 
 
 #endif
