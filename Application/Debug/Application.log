@@ -1,4 +1,3 @@
-﻿  Application.cpp
-  SceneTemplate.cpp
-  Generating Code...
-  Application.vcxproj -> C:\Users\65916\Desktop\Projects\COMG OFFICIAL\Debug\Application.exe
+﻿  SceneCity.cpp
+C:\Users\avxl0\OneDrive\Documents\GitHub\SP2Framework\Application\Source\SceneCity.cpp(301,17): warning C4018: '<': signed/unsigned mismatch
+  Application.vcxproj -> C:\Users\avxl0\OneDrive\Documents\GitHub\SP2Framework\Debug\Application.exe
