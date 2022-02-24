@@ -1,4 +1,43 @@
 ﻿  Application.cpp
-  SceneTemplate.cpp
+  Camera.cpp
+  CameraCity.cpp
+  CameraHome.cpp
+  clock.cpp
+C:\Users\avxl0\OneDrive\Documents\GitHub\SP2Framework\Application\Source\clock.cpp(18,12): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
+  dialogue.cpp
+  FIrstPersonCamera.cpp
+  game.cpp
+  gameManager.cpp
+  LoadOBJ.cpp
+  LoadTGA.cpp
+  main.cpp
+  Mesh.cpp
+  MeshBuilder.cpp
+C:\Users\avxl0\OneDrive\Documents\GitHub\SP2Framework\Application\Source\MeshBuilder.cpp(76,115): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\avxl0\OneDrive\Documents\GitHub\SP2Framework\Application\Source\MeshBuilder.cpp(76,105): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\avxl0\OneDrive\Documents\GitHub\SP2Framework\Application\Source\MeshBuilder.cpp(78,109): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\avxl0\OneDrive\Documents\GitHub\SP2Framework\Application\Source\MeshBuilder.cpp(82,106): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+  phone.cpp
+  player.cpp
+  SceneCity.cpp
+C:\Users\avxl0\OneDrive\Documents\GitHub\SP2Framework\Application\Source\SceneCity.cpp(166,36): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Users\avxl0\OneDrive\Documents\GitHub\SP2Framework\Application\Source\SceneCity.cpp(343,17): warning C4018: '<': signed/unsigned mismatch
+  SceneFinal.cpp
+C:\Users\avxl0\OneDrive\Documents\GitHub\SP2Framework\Application\Source\SceneFinal.cpp(261,21): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
+C:\Users\avxl0\OneDrive\Documents\GitHub\SP2Framework\Application\Source\SceneFinal.cpp(268,12): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+  SceneHome.cpp
+C:\Users\avxl0\OneDrive\Documents\GitHub\SP2Framework\Application\Source\SceneHome.cpp(142,40): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Users\avxl0\OneDrive\Documents\GitHub\SP2Framework\Application\Source\SceneHome.cpp(293,18): warning C4018: '<': signed/unsigned mismatch
+C:\Users\avxl0\OneDrive\Documents\GitHub\SP2Framework\Application\Source\SceneHome.cpp(369,44): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\avxl0\OneDrive\Documents\GitHub\SP2Framework\Application\Source\SceneHome.cpp(929,92): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+  SceneLoading.cpp
   Generating Code...
-  Application.vcxproj -> C:\Users\65916\Desktop\Projects\COMG OFFICIAL\Debug\Application.exe
+  Compiling...
+  SceneMenu.cpp
+C:\Users\avxl0\OneDrive\Documents\GitHub\SP2Framework\Application\Source\SceneMenu.cpp(966,87): warning C4305: 'argument': truncation from 'double' to 'float'
+  SceneOffice.cpp
+  SceneTemplate.cpp
+  shader.cpp
+  Utility.cpp
+  Generating Code...
+  Application.vcxproj -> C:\Users\avxl0\OneDrive\Documents\GitHub\SP2Framework\Debug\Application.exe

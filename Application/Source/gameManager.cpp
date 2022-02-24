@@ -47,6 +47,7 @@ void gameManager::Update(double dt)
 	{
 	case gameManager::GS_MENU:
 		scene = scenes[4];
+		scene->UseScene();
 		if (scene->goNextScene == true) {
 			StartGame();
 			nextLocation = gameManager::GS_HOME;
@@ -58,6 +59,7 @@ void gameManager::Update(double dt)
 		break;
 	case gameManager::GS_HOME:
 		scene = scenes[1];
+		scene->UseScene();
 		if (scene->goNextScene == true) {
 			nextLocation = gameManager::GS_WALKINGTOWORK;
 			currGameState = gameManager::GS_LOADING;
@@ -70,6 +72,7 @@ void gameManager::Update(double dt)
 		break;
 	case gameManager::GS_WALKINGTOWORK:
 		scene = scenes[2];
+		scene->UseScene();
 		if (scene->goNextScene == true) {
 			nextLocation = gameManager::GS_OFFICE;
 			currGameState = gameManager::GS_LOADING;
@@ -82,6 +85,7 @@ void gameManager::Update(double dt)
 		break;
 	case gameManager::GS_OFFICE:
 		scene = scenes[0];
+		scene->UseScene();
 		if (scene->goNextScene == true) {
 			nextLocation = gameManager::GS_FINAL;
 			currGameState = gameManager::GS_LOADING;

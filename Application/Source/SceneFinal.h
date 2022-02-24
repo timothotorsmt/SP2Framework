@@ -92,6 +92,7 @@ public:
 	void Update(double dt);
 	void Render();
 	void Reset();
+	void UseScene();
 	void Exit();
 
 private:

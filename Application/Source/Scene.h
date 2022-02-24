@@ -15,6 +15,7 @@ public:
 	virtual void Render() = 0;
 	virtual void Reset() = 0;
 	virtual void Exit() = 0;
+	virtual void UseScene() = 0;
 
 	bool goNextScene = false;
 	bool goNextScene2 = false;

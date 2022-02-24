@@ -144,6 +144,18 @@ class SceneOffice : public Scene
 		U_LIGHT1_COSINNER,
 		U_LIGHT1_EXPONENT,
 
+		U_LIGHT2_POSITION,
+		U_LIGHT2_COLOR,
+		U_LIGHT2_POWER,
+		U_LIGHT2_KC,
+		U_LIGHT2_KL,
+		U_LIGHT2_KQ,
+		U_LIGHT2_TYPE,
+		U_LIGHT2_SPOTDIRECTION,
+		U_LIGHT2_COSCUTOFF,
+		U_LIGHT2_COSINNER,
+		U_LIGHT2_EXPONENT,
+
 		U_NUMLIGHTS,
 		U_COLOR_TEXTURE_ENABLED,
 		U_COLOR_TEXTURE,
@@ -197,6 +209,7 @@ public:
 	void Render();
 	void Reset();
 	void Exit();
+	void UseScene();
 
 private:
 	unsigned m_vertexArrayID;

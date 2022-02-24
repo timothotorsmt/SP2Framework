@@ -3,6 +3,7 @@
 
 #include "Scene.h"
 #include "FirstPersonCamera.h"
+#include "CameraCity.h"
 #include "Mesh.h"
 #include "MeshBuilder.h"
 #include "Vertex.h"
@@ -145,6 +146,30 @@ class SceneCity : public Scene
 		U_LIGHT1_COSINNER,
 		U_LIGHT1_EXPONENT,
 
+		U_LIGHT2_POSITION,
+		U_LIGHT2_COLOR,
+		U_LIGHT2_POWER,
+		U_LIGHT2_KC,
+		U_LIGHT2_KL,
+		U_LIGHT2_KQ,
+		U_LIGHT2_TYPE,
+		U_LIGHT2_SPOTDIRECTION,
+		U_LIGHT2_COSCUTOFF,
+		U_LIGHT2_COSINNER,
+		U_LIGHT2_EXPONENT,
+
+		U_LIGHT3_POSITION,
+		U_LIGHT3_COLOR,
+		U_LIGHT3_POWER,
+		U_LIGHT3_KC,
+		U_LIGHT3_KL,
+		U_LIGHT3_KQ,
+		U_LIGHT3_TYPE,
+		U_LIGHT3_SPOTDIRECTION,
+		U_LIGHT3_COSCUTOFF,
+		U_LIGHT3_COSINNER,
+		U_LIGHT3_EXPONENT,
+
 		U_NUMLIGHTS,
 		U_COLOR_TEXTURE_ENABLED,
 		U_COLOR_TEXTURE,
@@ -203,6 +228,8 @@ public:
 	void Render();
 	void Reset();
 	void Exit();
+	void UseScene();
+
 
 private:
 	unsigned m_vertexArrayID;
@@ -210,7 +237,7 @@ private:
 	unsigned m_parameters[U_TOTAL];
 	Mesh* meshList[NUM_GEOMETRY];
 
-	FirstPersonCamera camera;
+	CameraCity camera;
 	MS modelStack, viewStack, projectionStack;
 	Light light[5];
 

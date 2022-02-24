@@ -280,6 +280,17 @@ void SceneLoading::Reset()
 {
 }
 
+void SceneLoading::UseScene()
+{
+	glBindVertexArray(m_vertexArrayID);
+	glUseProgram(m_programID);
+
+	Mesh::SetMaterialLoc(m_parameters[U_MATERIAL_AMBIENT],
+		m_parameters[U_MATERIAL_DIFFUSE],
+		m_parameters[U_MATERIAL_SPECULAR],
+		m_parameters[U_MATERIAL_SHININESS]);
+}
+
 void SceneLoading::Exit()
 {
 	// Cleanup VBO here

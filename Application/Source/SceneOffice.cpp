@@ -68,6 +68,18 @@ void SceneOffice::Init()
 		m_parameters[U_LIGHT1_COSINNER] = glGetUniformLocation(m_programID, "lights[1].cosInner");
 		m_parameters[U_LIGHT1_EXPONENT] = glGetUniformLocation(m_programID, "lights[1].exponent");
 
+		m_parameters[U_LIGHT2_POSITION] = glGetUniformLocation(m_programID, "lights[2].position_cameraspace");
+		m_parameters[U_LIGHT2_COLOR] = glGetUniformLocation(m_programID, "lights[2].color");
+		m_parameters[U_LIGHT2_POWER] = glGetUniformLocation(m_programID, "lights[2].power");
+		m_parameters[U_LIGHT2_KC] = glGetUniformLocation(m_programID, "lights[2].kC");
+		m_parameters[U_LIGHT2_KL] = glGetUniformLocation(m_programID, "lights[2].kL");
+		m_parameters[U_LIGHT2_KQ] = glGetUniformLocation(m_programID, "lights[2].kQ");
+		m_parameters[U_LIGHT2_TYPE] = glGetUniformLocation(m_programID, "lights[2].type");
+		m_parameters[U_LIGHT2_SPOTDIRECTION] = glGetUniformLocation(m_programID, "lights[2].spotDirection");
+		m_parameters[U_LIGHT2_COSCUTOFF] = glGetUniformLocation(m_programID, "lights[2].cosCutoff");
+		m_parameters[U_LIGHT2_COSINNER] = glGetUniformLocation(m_programID, "lights[2].cosInner");
+		m_parameters[U_LIGHT2_EXPONENT] = glGetUniformLocation(m_programID, "lights[2].exponent");
+
 		m_parameters[U_NUMLIGHTS] = glGetUniformLocation(m_programID, "numLights");
 		m_parameters[U_COLOR_TEXTURE_ENABLED] = glGetUniformLocation(m_programID, "colorTextureEnabled");
 		m_parameters[U_COLOR_TEXTURE] = glGetUniformLocation(m_programID, "colorTexture");
@@ -76,24 +88,24 @@ void SceneOffice::Init()
 		m_parameters[U_TEXT_COLOR] = glGetUniformLocation(m_programID, "textColor");
 		//use our shader
 		glUseProgram(m_programID);
-		glUniform1i(m_parameters[U_NUMLIGHTS], 2);
+		glUniform1i(m_parameters[U_NUMLIGHTS], 3);
 	}
 
 	//light parameters
 	{
 		//get a handle for our "MVP" uniform
 		m_parameters[U_MVP] = glGetUniformLocation(m_programID, "MVP");
-		light[0].type = Light::LIGHT_DIRECTIONAL;
+		light[0].type = Light::LIGHT_POINT;
 		light[0].position.Set(0, 40, 0);
-		light[0].color.Set(0.9f, 0.8f, 0.5);
-		light[0].power = 0.6f;
+		light[0].color.Set(1.f, 0.8f, 0.6f);
+		light[0].power = 3.f;
 		light[0].kC = 1.f;
 		light[0].kL = 0.01f;
 		light[0].kQ = 0.001f;
 		light[0].cosCutoff = cos(Math::DegreeToRadian(45));
 		light[0].cosInner = cos(Math::DegreeToRadian(30));
 		light[0].exponent = 3.f;
-		light[0].spotDirection.Set(0.f, 0.f, 0.f);
+		light[0].spotDirection.Set(0.f, -1.f, 0.f);
 
 		glUniform1i(m_parameters[U_LIGHT0_TYPE], light[0].type);
 		glUniform3fv(m_parameters[U_LIGHT0_COLOR], 1, &light[0].color.r);
@@ -105,10 +117,10 @@ void SceneOffice::Init()
 		glUniform1f(m_parameters[U_LIGHT0_COSINNER], light[0].cosInner);
 		glUniform1f(m_parameters[U_LIGHT0_EXPONENT], light[0].exponent);
 
-		light[1].type = Light::LIGHT_POINT;
-		light[1].position.Set(0, 15, 0);
+		light[1].type = Light::LIGHT_SPOT;
+		light[1].position.Set(-67, 40, 20);
 		light[1].color.Set(0.9f, 0.8f, 0.5);
-		light[1].power = 0.0f;
+		light[1].power = 2.0f;
 		light[1].kC = 1.f;
 		light[1].kL = 0.01f;
 		light[1].kQ = 0.001f;
@@ -305,8 +317,6 @@ void SceneOffice::Update(double dt)
 	Application::getCursorPosition(xpos, ypos);
 	Application::worldSpaceToScreenSpace(xpos, ypos);
 	Application::hideCursorWhenInScreen();
-
-	std::cout << xpos << " " << ypos << "\n";
 
 	if (NotificationTimer > 0) {
 		//TODO: add animation
@@ -929,8 +939,17 @@ void SceneOffice::Render()
 	Mtx44 MVP = projectionStack.Top() * viewStack.Top() * modelStack.Top();
 	glUniformMatrix4fv(m_parameters[U_MVP], 1, GL_FALSE, &MVP.a[0]); //update the shader with new MVP
 
+	//main office light
 	Position lightPosition_cameraspace = viewStack.Top() * light[0].position;
 	glUniform3fv(m_parameters[U_LIGHT0_POSITION], 1, &lightPosition_cameraspace.x);
+	Vector3 lightSpot_camera = viewStack.Top() * light[0].spotDirection;
+	glUniform3fv(m_parameters[U_LIGHT0_SPOTDIRECTION], 1, &lightSpot_camera.x);
+
+	//computer light
+	Position lightPosition1_cameraspace = viewStack.Top() * light[1].position;
+	glUniform3fv(m_parameters[U_LIGHT1_POSITION], 1, &lightPosition1_cameraspace.x);
+	Vector3 lightSpot1_camera = viewStack.Top() * light[1].spotDirection;
+	glUniform3fv(m_parameters[U_LIGHT1_SPOTDIRECTION], 1, &lightSpot1_camera.x);
 
 	//render skybox, axes and lightball
 	{
@@ -2014,6 +2033,17 @@ std::vector<float> SceneOffice::getNumberValues(std::string filename)
 		std::cout << "Could not open the file\n";
 
 	return ret;
+}
+
+void SceneOffice::UseScene()
+{
+	glBindVertexArray(m_vertexArrayID);
+	glUseProgram(m_programID);
+
+	Mesh::SetMaterialLoc(m_parameters[U_MATERIAL_AMBIENT],
+		m_parameters[U_MATERIAL_DIFFUSE],
+		m_parameters[U_MATERIAL_SPECULAR],
+		m_parameters[U_MATERIAL_SHININESS]);
 }
 
 void SceneOffice::initialiseShop(std::string textFile)

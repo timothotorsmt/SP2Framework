@@ -67,6 +67,18 @@ void SceneHome::Init()
 		m_parameters[U_LIGHT1_COSINNER] = glGetUniformLocation(m_programID, "lights[1].cosInner");
 		m_parameters[U_LIGHT1_EXPONENT] = glGetUniformLocation(m_programID, "lights[1].exponent");
 
+		m_parameters[U_LIGHT2_POSITION] = glGetUniformLocation(m_programID, "lights[2].position_cameraspace");
+		m_parameters[U_LIGHT2_COLOR] = glGetUniformLocation(m_programID, "lights[2].color");
+		m_parameters[U_LIGHT2_POWER] = glGetUniformLocation(m_programID, "lights[2].power");
+		m_parameters[U_LIGHT2_KC] = glGetUniformLocation(m_programID, "lights[2].kC");
+		m_parameters[U_LIGHT2_KL] = glGetUniformLocation(m_programID, "lights[2].kL");
+		m_parameters[U_LIGHT2_KQ] = glGetUniformLocation(m_programID, "lights[2].kQ");
+		m_parameters[U_LIGHT2_TYPE] = glGetUniformLocation(m_programID, "lights[2].type");
+		m_parameters[U_LIGHT2_SPOTDIRECTION] = glGetUniformLocation(m_programID, "lights[2].spotDirection");
+		m_parameters[U_LIGHT2_COSCUTOFF] = glGetUniformLocation(m_programID, "lights[2].cosCutoff");
+		m_parameters[U_LIGHT2_COSINNER] = glGetUniformLocation(m_programID, "lights[2].cosInner");
+		m_parameters[U_LIGHT2_EXPONENT] = glGetUniformLocation(m_programID, "lights[2].exponent");
+
 		m_parameters[U_NUMLIGHTS] = glGetUniformLocation(m_programID, "numLights");
 		m_parameters[U_COLOR_TEXTURE_ENABLED] = glGetUniformLocation(m_programID, "colorTextureEnabled");
 		m_parameters[U_COLOR_TEXTURE] = glGetUniformLocation(m_programID, "colorTexture");
@@ -75,15 +87,15 @@ void SceneHome::Init()
 		m_parameters[U_TEXT_COLOR] = glGetUniformLocation(m_programID, "textColor");
 		//use our shader
 		glUseProgram(m_programID);
-		glUniform1i(m_parameters[U_NUMLIGHTS], 2);
+		glUniform1i(m_parameters[U_NUMLIGHTS], 3);
 	}
 
 	//light parameters
 	{
 		//get a handle for our "MVP" uniform
 		m_parameters[U_MVP] = glGetUniformLocation(m_programID, "MVP");
-		light[0].type = Light::LIGHT_DIRECTIONAL;
-		light[0].position.Set(0, 40, 0);
+		light[0].type = Light::LIGHT_SPOT;
+		light[0].position.Set(43, 40, 94);
 		light[0].color.Set(0.9f, 0.8f, 0.5);
 		light[0].power = 1.f;
 		light[0].kC = 1.f;
@@ -92,7 +104,7 @@ void SceneHome::Init()
 		light[0].cosCutoff = cos(Math::DegreeToRadian(45));
 		light[0].cosInner = cos(Math::DegreeToRadian(30));
 		light[0].exponent = 3.f;
-		light[0].spotDirection.Set(0.f, 0.f, 0.f);
+		light[0].spotDirection.Set(0.f, 1.f, 0.f);
 
 		glUniform1i(m_parameters[U_LIGHT0_TYPE], light[0].type);
 		glUniform3fv(m_parameters[U_LIGHT0_COLOR], 1, &light[0].color.r);
@@ -104,10 +116,10 @@ void SceneHome::Init()
 		glUniform1f(m_parameters[U_LIGHT0_COSINNER], light[0].cosInner);
 		glUniform1f(m_parameters[U_LIGHT0_EXPONENT], light[0].exponent);
 
-		light[1].type = Light::LIGHT_DIRECTIONAL;
-		light[1].position.Set(0, 40, 0);
-		light[1].color.Set(0.9f, 0.8f, 0.5);
-		light[1].power = 1.f;
+		light[1].type = Light::LIGHT_POINT;
+		light[1].position.Set(0, 80, 0);
+		light[1].color.Set(1.f, 0.8f, 0.6f);
+		light[1].power = 5.f;
 		light[1].kC = 1.f;
 		light[1].kL = 0.01f;
 		light[1].kQ = 0.001f;
@@ -125,6 +137,28 @@ void SceneHome::Init()
 		glUniform1f(m_parameters[U_LIGHT1_COSCUTOFF], light[1].cosCutoff);
 		glUniform1f(m_parameters[U_LIGHT1_COSINNER], light[1].cosInner);
 		glUniform1f(m_parameters[U_LIGHT1_EXPONENT], light[1].exponent);
+
+		light[2].type = Light::LIGHT_POINT;
+		light[2].position.Set(-21.7, 25, -8.1);
+		light[2].color.Set(0.9f, 0.8f, 0.5);
+		light[2].power = 3.f;
+		light[2].kC = 1.f;
+		light[2].kL = 0.01f;
+		light[2].kQ = 0.001f;
+		light[2].cosCutoff = cos(Math::DegreeToRadian(45));
+		light[2].cosInner = cos(Math::DegreeToRadian(30));
+		light[2].exponent = 3.f;
+		light[2].spotDirection.Set(0.f, 1.f, 0.f);
+
+		glUniform1i(m_parameters[U_LIGHT2_TYPE], light[2].type);
+		glUniform3fv(m_parameters[U_LIGHT2_COLOR], 1, &light[2].color.r);
+		glUniform1f(m_parameters[U_LIGHT2_POWER], light[2].power);
+		glUniform1f(m_parameters[U_LIGHT2_KC], light[2].kC);
+		glUniform1f(m_parameters[U_LIGHT2_KL], light[2].kL);
+		glUniform1f(m_parameters[U_LIGHT2_KQ], light[2].kQ);
+		glUniform1f(m_parameters[U_LIGHT2_COSCUTOFF], light[2].cosCutoff);
+		glUniform1f(m_parameters[U_LIGHT2_COSINNER], light[2].cosInner);
+		glUniform1f(m_parameters[U_LIGHT2_EXPONENT], light[2].exponent);
 	}
 
 	camera.Init(Vector3(0, 15, 0), Vector3(0, 10, -10), Vector3(0, 1, 0));
@@ -287,7 +321,6 @@ void SceneHome::Update(double dt)
 	socialMeter = static_cast<int>(Player->getSocialMeter());
 	money = static_cast<int>(Player->getMoney());
 
-	std::cout << camera.position.x << " " << camera.position.z << "\n";
 
 	//boundaries
 	{
@@ -333,7 +366,7 @@ void SceneHome::Update(double dt)
 	if (tutorialStep == 2) {
 		if (Application::isMouseButtonPressed(0) && 11 <= xpos && xpos <= 51 && ypos < 30) {
 			camera.canLookAround = false;
-			camera.CAMERA_SPEED = (xpos - 11) * 7.5;
+			camera.CAMERA_SPEED = (xpos - 11) * 7.5 + 1;
 		}
 		else {
 			camera.canLookAround = true;
@@ -412,6 +445,11 @@ void SceneHome::Update(double dt)
 
 		distanceFromDoor = camera.position.Distance(Vector3(44, camera.position.y, 98));
 		angleFromDoor = camera.angleDifference(Vector3(44, camera.position.y, 98));
+
+		//go to city scene
+		if (Application::IsKeyPressed('Z') && Application::IsKeyPressed('X')) {
+			goNextScene = true;
+		}
 
 		if (tutorialStep >= 10) {
 			if (distanceFromDoor < 20 && -30 < angleFromDoor && -50 < angleFromDoor && mouseToggle && Application::isMouseButtonPressed(0)) {
@@ -577,8 +615,21 @@ void SceneHome::Render()
 	Mtx44 MVP = projectionStack.Top() * viewStack.Top() * modelStack.Top();
 	glUniformMatrix4fv(m_parameters[U_MVP], 1, GL_FALSE, &MVP.a[0]); //update the shader with new MVP
 
-	Position lightPosition_cameraspace = viewStack.Top() * light[0].position;
-	glUniform3fv(m_parameters[U_LIGHT0_POSITION], 1, &lightPosition_cameraspace.x);
+	//door light
+	Position lightPosition1_cameraspace = viewStack.Top() * light[0].position;
+	glUniform3fv(m_parameters[U_LIGHT0_POSITION], 1, &lightPosition1_cameraspace.x);
+	Vector3 lightSpot_camera = viewStack.Top() * light[0].spotDirection;
+	glUniform3fv(m_parameters[U_LIGHT0_SPOTDIRECTION], 1, &lightSpot_camera.x);
+
+	//main light
+	Position lightPosition_cameraspace = viewStack.Top() * light[1].position;
+	glUniform3fv(m_parameters[U_LIGHT1_POSITION], 1, &lightPosition_cameraspace.x);
+
+	//lamp light
+	Position lightPosition2_cameraspace = viewStack.Top() * light[2].position;
+	glUniform3fv(m_parameters[U_LIGHT2_POSITION], 1, &lightPosition2_cameraspace.x);
+	Vector3 lightSpot2_camera = viewStack.Top() * light[2].spotDirection;
+	glUniform3fv(m_parameters[U_LIGHT2_SPOTDIRECTION], 1, &lightSpot2_camera.x);
 
 	//render skybox, axes and lightball
 	{
@@ -965,6 +1016,17 @@ void SceneHome::Exit()
 	glDeleteVertexArrays(1, &m_vertexArrayID);
 
 	glDeleteProgram(m_programID);
+}
+
+void SceneHome::UseScene()
+{
+	glBindVertexArray(m_vertexArrayID);
+	glUseProgram(m_programID);
+
+	Mesh::SetMaterialLoc(m_parameters[U_MATERIAL_AMBIENT],
+		m_parameters[U_MATERIAL_DIFFUSE],
+		m_parameters[U_MATERIAL_SPECULAR],
+		m_parameters[U_MATERIAL_SHININESS]);
 }
 
 void SceneHome::RenderMesh(Mesh* mesh, bool enableLight)

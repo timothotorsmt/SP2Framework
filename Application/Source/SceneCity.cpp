@@ -67,6 +67,18 @@ void SceneCity::Init()
 		m_parameters[U_LIGHT1_COSINNER] = glGetUniformLocation(m_programID, "lights[1].cosInner");
 		m_parameters[U_LIGHT1_EXPONENT] = glGetUniformLocation(m_programID, "lights[1].exponent");
 
+		m_parameters[U_LIGHT2_POSITION] = glGetUniformLocation(m_programID, "lights[2].position_cameraspace");
+		m_parameters[U_LIGHT2_COLOR] = glGetUniformLocation(m_programID, "lights[2].color");
+		m_parameters[U_LIGHT2_POWER] = glGetUniformLocation(m_programID, "lights[2].power");
+		m_parameters[U_LIGHT2_KC] = glGetUniformLocation(m_programID, "lights[2].kC");
+		m_parameters[U_LIGHT2_KL] = glGetUniformLocation(m_programID, "lights[2].kL");
+		m_parameters[U_LIGHT2_KQ] = glGetUniformLocation(m_programID, "lights[2].kQ");
+		m_parameters[U_LIGHT2_TYPE] = glGetUniformLocation(m_programID, "lights[2].type");
+		m_parameters[U_LIGHT2_SPOTDIRECTION] = glGetUniformLocation(m_programID, "lights[2].spotDirection");
+		m_parameters[U_LIGHT2_COSCUTOFF] = glGetUniformLocation(m_programID, "lights[2].cosCutoff");
+		m_parameters[U_LIGHT2_COSINNER] = glGetUniformLocation(m_programID, "lights[2].cosInner");
+		m_parameters[U_LIGHT2_EXPONENT] = glGetUniformLocation(m_programID, "lights[2].exponent");
+
 		m_parameters[U_NUMLIGHTS] = glGetUniformLocation(m_programID, "numLights");
 		m_parameters[U_COLOR_TEXTURE_ENABLED] = glGetUniformLocation(m_programID, "colorTextureEnabled");
 		m_parameters[U_COLOR_TEXTURE] = glGetUniformLocation(m_programID, "colorTexture");
@@ -75,7 +87,7 @@ void SceneCity::Init()
 		m_parameters[U_TEXT_COLOR] = glGetUniformLocation(m_programID, "textColor");
 		//use our shader
 		glUseProgram(m_programID);
-		glUniform1i(m_parameters[U_NUMLIGHTS], 2);
+		glUniform1i(m_parameters[U_NUMLIGHTS], 5);
 	}
 
 	//light parameters
@@ -83,16 +95,16 @@ void SceneCity::Init()
 		//get a handle for our "MVP" uniform
 		m_parameters[U_MVP] = glGetUniformLocation(m_programID, "MVP");
 		light[0].type = Light::LIGHT_DIRECTIONAL;
-		light[0].position.Set(0, 40, 0);
-		light[0].color.Set(0.9f, 0.8f, 0.5);
-		light[0].power = 0.6f;
+		light[0].position.Set(0, 100, 0);
+		light[0].color.Set(1.f, 0.8f, 0.6f);
+		light[0].power = 0.5f;
 		light[0].kC = 1.f;
 		light[0].kL = 0.01f;
 		light[0].kQ = 0.001f;
 		light[0].cosCutoff = cos(Math::DegreeToRadian(45));
 		light[0].cosInner = cos(Math::DegreeToRadian(30));
 		light[0].exponent = 3.f;
-		light[0].spotDirection.Set(0.f, 0.f, 0.f);
+		light[0].spotDirection.Set(0.f, 1.f, 0.f);
 
 		glUniform1i(m_parameters[U_LIGHT0_TYPE], light[0].type);
 		glUniform3fv(m_parameters[U_LIGHT0_COLOR], 1, &light[0].color.r);
@@ -104,10 +116,11 @@ void SceneCity::Init()
 		glUniform1f(m_parameters[U_LIGHT0_COSINNER], light[0].cosInner);
 		glUniform1f(m_parameters[U_LIGHT0_EXPONENT], light[0].exponent);
 
-		light[1].type = Light::LIGHT_POINT;
-		light[1].position.Set(0, 15, 0);
+		//charity people
+		light[1].type = Light::LIGHT_SPOT;
+		light[1].position.Set(28, 20, 384);
 		light[1].color.Set(0.9f, 0.8f, 0.5);
-		light[1].power = 0.0f;
+		light[1].power = 1.0f;
 		light[1].kC = 1.f;
 		light[1].kL = 0.01f;
 		light[1].kQ = 0.001f;
@@ -125,6 +138,50 @@ void SceneCity::Init()
 		glUniform1f(m_parameters[U_LIGHT1_COSCUTOFF], light[1].cosCutoff);
 		glUniform1f(m_parameters[U_LIGHT1_COSINNER], light[1].cosInner);
 		glUniform1f(m_parameters[U_LIGHT1_EXPONENT], light[1].exponent);
+
+		light[2].type = Light::LIGHT_SPOT;
+		light[2].position.Set(156, 20, 162);
+		light[2].color.Set(0.9f, 0.8f, 0.5);
+		light[2].power = 1.0f;
+		light[2].kC = 1.f;
+		light[2].kL = 0.01f;
+		light[2].kQ = 0.001f;
+		light[2].cosCutoff = cos(Math::DegreeToRadian(45));
+		light[2].cosInner = cos(Math::DegreeToRadian(30));
+		light[2].exponent = 3.f;
+		light[2].spotDirection.Set(0.f, 1.f, 0.f);
+
+		glUniform1i(m_parameters[U_LIGHT2_TYPE], light[2].type);
+		glUniform3fv(m_parameters[U_LIGHT2_COLOR], 1, &light[2].color.r);
+		glUniform1f(m_parameters[U_LIGHT2_POWER], light[2].power);
+		glUniform1f(m_parameters[U_LIGHT2_KC], light[2].kC);
+		glUniform1f(m_parameters[U_LIGHT2_KL], light[2].kL);
+		glUniform1f(m_parameters[U_LIGHT2_KQ], light[2].kQ);
+		glUniform1f(m_parameters[U_LIGHT2_COSCUTOFF], light[2].cosCutoff);
+		glUniform1f(m_parameters[U_LIGHT2_COSINNER], light[2].cosInner);
+		glUniform1f(m_parameters[U_LIGHT2_EXPONENT], light[2].exponent);
+
+		light[3].type = Light::LIGHT_POINT;
+		light[3].position.Set(-195, 10, -42);
+		light[3].color.Set(1.f, 0.4f, 0.2);
+		light[3].power = 10.0f;
+		light[3].kC = 1.f;
+		light[3].kL = 0.01f;
+		light[3].kQ = 0.001f;
+		light[3].cosCutoff = cos(Math::DegreeToRadian(45));
+		light[3].cosInner = cos(Math::DegreeToRadian(30));
+		light[3].exponent = 3.f;
+		light[3].spotDirection.Set(0.f, 1.f, 0.f);
+
+		glUniform1i(m_parameters[U_LIGHT3_TYPE], light[3].type);
+		glUniform3fv(m_parameters[U_LIGHT3_COLOR], 1, &light[3].color.r);
+		glUniform1f(m_parameters[U_LIGHT3_POWER], light[3].power);
+		glUniform1f(m_parameters[U_LIGHT3_KC], light[3].kC);
+		glUniform1f(m_parameters[U_LIGHT3_KL], light[3].kL);
+		glUniform1f(m_parameters[U_LIGHT3_KQ], light[3].kQ);
+		glUniform1f(m_parameters[U_LIGHT3_COSCUTOFF], light[3].cosCutoff);
+		glUniform1f(m_parameters[U_LIGHT3_COSINNER], light[3].cosInner);
+		glUniform1f(m_parameters[U_LIGHT3_EXPONENT], light[3].exponent);
 	}
 
 	camera.Init(Vector3(244, 15, 331), Vector3(0, 10, -10), Vector3(0, 1, 0));
@@ -623,6 +680,23 @@ void SceneCity::Render()
 
 	Position lightPosition_cameraspace = viewStack.Top() * light[0].position;
 	glUniform3fv(m_parameters[U_LIGHT0_POSITION], 1, &lightPosition_cameraspace.x);
+	Vector3 lightSpot_camera = viewStack.Top() * light[0].spotDirection;
+	glUniform3fv(m_parameters[U_LIGHT0_SPOTDIRECTION], 1, &lightSpot_camera.x);
+
+	Position lightPosition1_cameraspace = viewStack.Top() * light[1].position;
+	glUniform3fv(m_parameters[U_LIGHT1_POSITION], 1, &lightPosition1_cameraspace.x);
+	Vector3 lightSpot1_camera = viewStack.Top() * light[1].spotDirection;
+	glUniform3fv(m_parameters[U_LIGHT1_SPOTDIRECTION], 1, &lightSpot1_camera.x);
+
+	Position lightPosition2_cameraspace = viewStack.Top() * light[2].position;
+	glUniform3fv(m_parameters[U_LIGHT2_POSITION], 1, &lightPosition2_cameraspace.x);
+	Vector3 lightSpot2_camera = viewStack.Top() * light[2].spotDirection;
+	glUniform3fv(m_parameters[U_LIGHT2_SPOTDIRECTION], 1, &lightSpot2_camera.x);
+
+	Position lightPosition3_cameraspace = viewStack.Top() * light[3].position;
+	glUniform3fv(m_parameters[U_LIGHT3_POSITION], 1, &lightPosition3_cameraspace.x);
+	Vector3 lightSpot3_camera = viewStack.Top() * light[3].spotDirection;
+	glUniform3fv(m_parameters[U_LIGHT3_SPOTDIRECTION], 1, &lightSpot3_camera.x);
 
 	//render skybox, axes and lightball
 	{
@@ -640,14 +714,14 @@ void SceneCity::Render()
 			//scale, translate, rotate
 			modelStack.Translate(28, 0, 384);
 			modelStack.Rotate(180, 0, 1, 0);
-			RenderMesh(meshList[GEO_CHARITY], true);
+			RenderMesh(meshList[GEO_CHARITY], false);
 			modelStack.PopMatrix();
 
 			modelStack.PushMatrix();
 			//scale, translate, rotate
 			modelStack.Translate(156, 0, 162);
 			modelStack.Rotate(90, 0, 1, 0);
-			RenderMesh(meshList[GEO_CHARITY], true);
+			RenderMesh(meshList[GEO_CHARITY], false);
 			modelStack.PopMatrix();
 		}
 
@@ -1234,13 +1308,13 @@ void SceneCity::Render()
 		modelStack.Translate(1.5f, 0, -1.5f);
 		RenderMesh(meshList[GEO_FARBUILDING4], true);
 		modelStack.PopMatrix();
-
-		modelStack.PushMatrix();
-		modelStack.Translate(-195, -0.4f, -42);
-		modelStack.Scale(2, 1, 2);
-		RenderMesh(meshList[GEO_MARKER], false);
-		modelStack.PopMatrix();
 	}
+
+	modelStack.PushMatrix();
+	modelStack.Translate(-195, -0.4f, -42);
+	modelStack.Scale(2, 1, 2);
+	RenderMesh(meshList[GEO_MARKER], false);
+	modelStack.PopMatrix();
 
 	//regular game UI
 	if (!isPhoneOpen) {
@@ -1282,11 +1356,15 @@ void SceneCity::Reset()
 {
 	camera.canLookAround = true;
 	camera.canMove = true;
+	hasEnteredOffice = false;
 
 	//distances from characters
 	isDialogue = false;
 	distanceFromCharacter1 = 0;
 	distanceFromCharacter2 = 0;
+
+	hasTalkedChar1 = false;
+	hasTalkedChar2 = false;
 
 	//in-game stuff
 	money = int(DEFAULTMONEY), socialMeter = int(DEFAULTSOCIALMETER);
@@ -1315,6 +1393,17 @@ void SceneCity::Exit()
 	glDeleteVertexArrays(1, &m_vertexArrayID);
 
 	glDeleteProgram(m_programID);
+}
+
+void SceneCity::UseScene()
+{
+	glBindVertexArray(m_vertexArrayID);
+	glUseProgram(m_programID);
+
+	Mesh::SetMaterialLoc(m_parameters[U_MATERIAL_AMBIENT],
+		m_parameters[U_MATERIAL_DIFFUSE],
+		m_parameters[U_MATERIAL_SPECULAR],
+		m_parameters[U_MATERIAL_SHININESS]);
 }
 
 void SceneCity::RenderMesh(Mesh* mesh, bool enableLight)
