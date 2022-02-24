@@ -22,6 +22,17 @@ SceneCity::~SceneCity()
 {
 }
 
+void SceneCity::UseScene()
+{
+	glBindVertexArray(m_vertexArrayID);
+	glUseProgram(m_programID);
+
+	Mesh::SetMaterialLoc(m_parameters[U_MATERIAL_AMBIENT],
+		m_parameters[U_MATERIAL_DIFFUSE],
+		m_parameters[U_MATERIAL_SPECULAR],
+		m_parameters[U_MATERIAL_SHININESS]);
+}
+
 void SceneCity::Init()
 {
 	// Init VBO here
@@ -67,6 +78,18 @@ void SceneCity::Init()
 		m_parameters[U_LIGHT1_COSINNER] = glGetUniformLocation(m_programID, "lights[1].cosInner");
 		m_parameters[U_LIGHT1_EXPONENT] = glGetUniformLocation(m_programID, "lights[1].exponent");
 
+		m_parameters[U_LIGHT2_POSITION] = glGetUniformLocation(m_programID, "lights[2].position_cameraspace");
+		m_parameters[U_LIGHT2_COLOR] = glGetUniformLocation(m_programID, "lights[2].color");
+		m_parameters[U_LIGHT2_POWER] = glGetUniformLocation(m_programID, "lights[2].power");
+		m_parameters[U_LIGHT2_KC] = glGetUniformLocation(m_programID, "lights[2].kC");
+		m_parameters[U_LIGHT2_KL] = glGetUniformLocation(m_programID, "lights[2].kL");
+		m_parameters[U_LIGHT2_KQ] = glGetUniformLocation(m_programID, "lights[2].kQ");
+		m_parameters[U_LIGHT2_TYPE] = glGetUniformLocation(m_programID, "lights[2].type");
+		m_parameters[U_LIGHT2_SPOTDIRECTION] = glGetUniformLocation(m_programID, "lights[2].spotDirection");
+		m_parameters[U_LIGHT2_COSCUTOFF] = glGetUniformLocation(m_programID, "lights[2].cosCutoff");
+		m_parameters[U_LIGHT2_COSINNER] = glGetUniformLocation(m_programID, "lights[2].cosInner");
+		m_parameters[U_LIGHT2_EXPONENT] = glGetUniformLocation(m_programID, "lights[2].exponent");
+
 		m_parameters[U_NUMLIGHTS] = glGetUniformLocation(m_programID, "numLights");
 		m_parameters[U_COLOR_TEXTURE_ENABLED] = glGetUniformLocation(m_programID, "colorTextureEnabled");
 		m_parameters[U_COLOR_TEXTURE] = glGetUniformLocation(m_programID, "colorTexture");
@@ -75,7 +98,7 @@ void SceneCity::Init()
 		m_parameters[U_TEXT_COLOR] = glGetUniformLocation(m_programID, "textColor");
 		//use our shader
 		glUseProgram(m_programID);
-		glUniform1i(m_parameters[U_NUMLIGHTS], 2);
+		glUniform1i(m_parameters[U_NUMLIGHTS], 4);
 	}
 
 	//light parameters
@@ -83,16 +106,16 @@ void SceneCity::Init()
 		//get a handle for our "MVP" uniform
 		m_parameters[U_MVP] = glGetUniformLocation(m_programID, "MVP");
 		light[0].type = Light::LIGHT_DIRECTIONAL;
-		light[0].position.Set(0, 50, 0);
-		light[0].color.Set(0.9f, 0.8f, 0.5);
-		light[0].power = 0.8f;
+		light[0].position.Set(0, 100, 0);
+		light[0].color.Set(1.f, 0.8f, 0.6f);
+		light[0].power = 0.5f;
 		light[0].kC = 1.f;
 		light[0].kL = 0.01f;
 		light[0].kQ = 0.001f;
 		light[0].cosCutoff = cos(Math::DegreeToRadian(45));
 		light[0].cosInner = cos(Math::DegreeToRadian(30));
 		light[0].exponent = 3.f;
-		light[0].spotDirection.Set(0.f, 0.f, 0.f);
+		light[0].spotDirection.Set(0.f, 1.f, 0.f);
 
 		glUniform1i(m_parameters[U_LIGHT0_TYPE], light[0].type);
 		glUniform3fv(m_parameters[U_LIGHT0_COLOR], 1, &light[0].color.r);
@@ -104,10 +127,11 @@ void SceneCity::Init()
 		glUniform1f(m_parameters[U_LIGHT0_COSINNER], light[0].cosInner);
 		glUniform1f(m_parameters[U_LIGHT0_EXPONENT], light[0].exponent);
 
+		//charity people
 		light[1].type = Light::LIGHT_SPOT;
-		light[1].position.Set(0, 15, 0);
+		light[1].position.Set(28 , 20, 384);
 		light[1].color.Set(0.9f, 0.8f, 0.5);
-		light[1].power = 0.0f;
+		light[1].power = 1.0f;
 		light[1].kC = 1.f;
 		light[1].kL = 0.01f;
 		light[1].kQ = 0.001f;
@@ -125,6 +149,28 @@ void SceneCity::Init()
 		glUniform1f(m_parameters[U_LIGHT1_COSCUTOFF], light[1].cosCutoff);
 		glUniform1f(m_parameters[U_LIGHT1_COSINNER], light[1].cosInner);
 		glUniform1f(m_parameters[U_LIGHT1_EXPONENT], light[1].exponent);
+
+		light[2].type = Light::LIGHT_SPOT;
+		light[2].position.Set(156, 20, 162);
+		light[2].color.Set(0.9f, 0.8f, 0.5);
+		light[2].power = 1.0f;
+		light[2].kC = 1.f;
+		light[2].kL = 0.01f;
+		light[2].kQ = 0.001f;
+		light[2].cosCutoff = cos(Math::DegreeToRadian(45));
+		light[2].cosInner = cos(Math::DegreeToRadian(30));
+		light[2].exponent = 3.f;
+		light[2].spotDirection.Set(0.f, 1.f, 0.f);
+
+		glUniform1i(m_parameters[U_LIGHT2_TYPE], light[2].type);
+		glUniform3fv(m_parameters[U_LIGHT2_COLOR], 1, &light[2].color.r);
+		glUniform1f(m_parameters[U_LIGHT2_POWER], light[2].power);
+		glUniform1f(m_parameters[U_LIGHT2_KC], light[2].kC);
+		glUniform1f(m_parameters[U_LIGHT2_KL], light[2].kL);
+		glUniform1f(m_parameters[U_LIGHT2_KQ], light[2].kQ);
+		glUniform1f(m_parameters[U_LIGHT2_COSCUTOFF], light[2].cosCutoff);
+		glUniform1f(m_parameters[U_LIGHT2_COSINNER], light[2].cosInner);
+		glUniform1f(m_parameters[U_LIGHT2_EXPONENT], light[2].exponent);
 	}
 
 	camera.Init(Vector3(244, 15, 331), Vector3(0, 10, -10), Vector3(0, 1, 0));
@@ -138,7 +184,7 @@ void SceneCity::Init()
 	//essentials
 	{
 		meshList[GEO_AXES] = MeshBuilder::GenerateAxes("reference", 100, 100, 100);
-		meshList[GEO_LIGHTBALL] = MeshBuilder::GenerateSphere("Lightball", Color(0.2f, 0.5f, 0.6f), 1, 10, 18);
+		meshList[GEO_LIGHTBALL] = MeshBuilder::GenerateSphere("Lightball", Color(1.f, 1.f, 1.f), 1, 10, 18);
 	}
 
 	//skybox
@@ -164,7 +210,7 @@ void SceneCity::Init()
 	meshList[GEO_TEXT] = MeshBuilder::GenerateText("text", 16, 16);
 	meshList[GEO_TEXT]->textureID = LoadTGA("Image//fonts//SegoeUI.tga");
 	meshList[GEO_DIALOG_BOX] = MeshBuilder::GenerateQuad("Diag", Color(1, 1, 1), 80, 30, 1);
-	meshList[GEO_DIALOG_BOX]->textureID = LoadTGA("Image//notif_box.tga");
+	meshList[GEO_DIALOG_BOX]->textureID = LoadTGA("Image//phoneUI//notif_box.tga");
 
 	meshList[GEO_WATCH] = MeshBuilder::GenerateQuad("watch", Color(1, 1, 1), 1, 1, 1);
 	meshList[GEO_WATCH]->textureID = LoadTGA("Image//watchInterface.tga");
@@ -203,7 +249,6 @@ void SceneCity::Init()
 
 	//city
 	{
-		//can u name properly wtf
 		meshList[GEO_HOUSE1] = MeshBuilder::GenerateOBJMTL("model7", "OBJ//City//MainHouse.obj", "OBJ//City//MainHouse.mtl");
 		meshList[GEO_ROAD] = MeshBuilder::GenerateOBJMTL("model7", "OBJ//City//Road.obj", "OBJ//City//Road.mtl");
 		meshList[GEO_HOUSE2] = MeshBuilder::GenerateOBJMTL("model7", "OBJ//City//house2.obj", "OBJ//City//house2.mtl");
@@ -236,7 +281,8 @@ void SceneCity::Init()
 		meshList[GEO_BIGAPARTMENT3] = MeshBuilder::GenerateOBJMTL("model7", "OBJ//City//BigApartment3.obj", "OBJ//City//BigApartment3.mtl");
 
 		meshList[GEO_BUILDING] = MeshBuilder::GenerateOBJMTL("model7", "OBJ//City//Building.obj", "OBJ//City//Building.mtl");
-		meshList[GEO_CHARITY] = MeshBuilder::GenerateOBJMTL("model7", "OBJ//City//basicCharacter.obj", "OBJ//City//basicCharacter.mtl");
+		meshList[GEO_CHARITY] = MeshBuilder::GenerateOBJ("model7", "OBJ//City//basicCharacter.obj");
+		meshList[GEO_CHARITY]->textureID = LoadTGA("Image//basicCharacter.tga");
 
 
 		meshList[GEO_CONDO] = MeshBuilder::GenerateOBJMTL("model7", "OBJ//City//Condo.obj", "OBJ//City//Condo.mtl");
@@ -256,31 +302,12 @@ void SceneCity::Init()
 		meshList[GEO_FARBUILDING4] = MeshBuilder::GenerateOBJMTL("model7", "OBJ//City//FarBuilding4.obj", "OBJ//City//FarBuilding4.mtl");
 
 		meshList[GEO_MARKER] = MeshBuilder::GenerateCylinder("marker", Color(0.9f, 0.3f, 0.3f), 5);
-		meshList[GEO_STREETLAMPS] = MeshBuilder::GenerateOBJMTL("model7", "OBJ//City//light_curved.obj", "OBJ//City//light_curved.mtl");
-	}
-
-	//street lamps
-	{
-		streetLamp.push_back(Vector3(0,0,0));
-		streetLamp.push_back(Vector3(0,0,0));
-		streetLamp.push_back(Vector3(0,0,0));
-		streetLamp.push_back(Vector3(0,0,0));
+		meshList[GEO_STREETLAMPS] = MeshBuilder::GenerateOBJMTL("model7", "City scene OBJ//light_curved.obj", "City scene OBJ//light_curved.mtl");
 	}
 
 	Mtx44 projection;
 	projection.SetToPerspective(45.f, 4.f / 3.f, 0.1f, 1000.f);
 	projectionStack.LoadMatrix(projection);
-}
-
-void SceneCity::UseScene()
-{
-	glBindVertexArray(m_vertexArrayID);
-	glUseProgram(m_programID);
-
-	Mesh::SetMaterialLoc(m_parameters[U_MATERIAL_AMBIENT],
-		m_parameters[U_MATERIAL_DIFFUSE],
-		m_parameters[U_MATERIAL_SPECULAR],
-		m_parameters[U_MATERIAL_SHININESS]);
 }
 
 void SceneCity::TransferGameInfo(Game* game)
@@ -292,11 +319,11 @@ void SceneCity::TransferGameInfo(Game* game)
 
 void SceneCity::Update(double dt)
 {
+	std::cout << camera.position.x << camera.position.z << std::endl;
 	camera.Update(static_cast<float>(dt));
 	Application::getCursorPosition(xpos, ypos);
 	Application::worldSpaceToScreenSpace(xpos, ypos);
 	Application::hideCursorWhenInScreen();
-	UseScene();
 
 	if (taskNumber < phone->taskList.size()) {
 		NotificationTimer = 5;
@@ -630,11 +657,37 @@ void SceneCity::Render()
 
 	Position lightPosition_cameraspace = viewStack.Top() * light[0].position;
 	glUniform3fv(m_parameters[U_LIGHT0_POSITION], 1, &lightPosition_cameraspace.x);
+	Vector3 lightSpot_camera = viewStack.Top() * light[0].spotDirection;
+	glUniform3fv(m_parameters[U_LIGHT0_SPOTDIRECTION], 1, &lightSpot_camera.x);
+
+	Position lightPosition1_cameraspace = viewStack.Top() * light[1].position;
+	glUniform3fv(m_parameters[U_LIGHT1_POSITION], 1, &lightPosition1_cameraspace.x);
+	Vector3 lightSpot1_camera = viewStack.Top() * light[1].spotDirection;
+	glUniform3fv(m_parameters[U_LIGHT1_SPOTDIRECTION], 1, &lightSpot1_camera.x);
+
+	Position lightPosition2_cameraspace = viewStack.Top() * light[2].position;
+	glUniform3fv(m_parameters[U_LIGHT2_POSITION], 1, &lightPosition2_cameraspace.x);
+	Vector3 lightSpot2_camera = viewStack.Top() * light[2].spotDirection;
+	glUniform3fv(m_parameters[U_LIGHT2_SPOTDIRECTION], 1, &lightSpot2_camera.x);
 
 	//render skybox, axes and lightball
 	{
 		RenderMesh(meshList[GEO_AXES], false);
 		RenderSkybox();
+
+		//main light
+		modelStack.PushMatrix();
+		modelStack.Translate(light[0].position.x, light[0].position.y, light[0].position.z);
+		RenderMesh(meshList[GEO_LIGHTBALL], false);
+		modelStack.PopMatrix();
+
+		for (int i = 1; i < 3; i++)
+		{
+			modelStack.PushMatrix();
+			modelStack.Translate(light[i].position.x, light[i].position.y, light[i].position.z);
+			RenderMesh(meshList[GEO_LIGHTBALL], false);
+			modelStack.PopMatrix();
+		}
 	}
 
 	//std::cout << camera.position.x << " " << camera.position.z << "\n";
@@ -646,6 +699,7 @@ void SceneCity::Render()
 			modelStack.PushMatrix();
 			//scale, translate, rotate
 			modelStack.Translate(28, 0, 384);
+			modelStack.Rotate(180, 0, 1, 0);
 			RenderMesh(meshList[GEO_CHARITY], true);
 			modelStack.PopMatrix();
 
@@ -1249,7 +1303,7 @@ void SceneCity::Render()
 	}
 
 	//street lamps
-	for (int i = 0; i < streetLamp.size(); i++)
+	/*for (int i = 0; i < streetLamp.size(); i++)
 	{
 		modelStack.PushMatrix();
 		modelStack.Translate(streetLamp[i].x, streetLamp[i].y, streetLamp[i].z);
@@ -1257,7 +1311,7 @@ void SceneCity::Render()
 		modelStack.Rotate(90, 0, 1, 0);
 		RenderMesh(meshList[GEO_STREETLAMPS], false);
 		modelStack.PopMatrix();
-	}
+	}*/
 
 	//regular game UI
 	if (!isPhoneOpen) {

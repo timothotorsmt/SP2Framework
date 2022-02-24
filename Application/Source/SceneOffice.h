@@ -190,8 +190,8 @@ public:
 	SceneOffice();
 	~SceneOffice();
 
-	void Init();
 	void UseScene();
+	void Init();
 	void TransferGameInfo(Game* game);
 	void Update(double dt);
 	void Render();

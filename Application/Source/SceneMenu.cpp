@@ -22,6 +22,17 @@ SceneMenu::~SceneMenu()
 {
 }
 
+void SceneMenu::UseScene()
+{
+	glBindVertexArray(m_vertexArrayID);
+	glUseProgram(m_programID);
+
+	Mesh::SetMaterialLoc(m_parameters[U_MATERIAL_AMBIENT],
+		m_parameters[U_MATERIAL_DIFFUSE],
+		m_parameters[U_MATERIAL_SPECULAR],
+		m_parameters[U_MATERIAL_SHININESS]);
+}
+
 void SceneMenu::Init()
 {
 	// Init VBO here

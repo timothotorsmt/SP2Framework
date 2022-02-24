@@ -144,6 +144,18 @@ class SceneCity : public Scene
 		U_LIGHT1_COSINNER,
 		U_LIGHT1_EXPONENT,
 
+		U_LIGHT2_POSITION,
+		U_LIGHT2_COLOR,
+		U_LIGHT2_POWER,
+		U_LIGHT2_KC,
+		U_LIGHT2_KL,
+		U_LIGHT2_KQ,
+		U_LIGHT2_TYPE,
+		U_LIGHT2_SPOTDIRECTION,
+		U_LIGHT2_COSCUTOFF,
+		U_LIGHT2_COSINNER,
+		U_LIGHT2_EXPONENT,
+
 		U_NUMLIGHTS,
 		U_COLOR_TEXTURE_ENABLED,
 		U_COLOR_TEXTURE,
@@ -196,8 +208,8 @@ public:
 	SceneCity();
 	~SceneCity();
 
-	void Init();
 	void UseScene();
+	void Init();
 	void TransferGameInfo(Game* game);
 	void Update(double dt);
 	void Render();
@@ -266,10 +278,6 @@ private:
 	//city
 	bool hasEnteredOffice = false;
 	float distanceToOffice = 0;
-	std::vector <Vector3> streetLamp;
 };
-
-
-
 
 #endif

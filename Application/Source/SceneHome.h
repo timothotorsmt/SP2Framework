@@ -87,6 +87,8 @@ class SceneHome : public Scene
 		U_MATERIAL_DIFFUSE,
 		U_MATERIAL_SPECULAR,
 		U_MATERIAL_SHININESS,
+
+		//door light
 		U_LIGHT0_POSITION,
 		U_LIGHT0_COLOR,
 		U_LIGHT0_POWER,
@@ -100,6 +102,7 @@ class SceneHome : public Scene
 		U_LIGHT0_COSINNER,
 		U_LIGHT0_EXPONENT,
 
+		//ceiling light (main)
 		U_LIGHT1_POSITION,
 		U_LIGHT1_COLOR,
 		U_LIGHT1_POWER,
@@ -111,6 +114,32 @@ class SceneHome : public Scene
 		U_LIGHT1_COSCUTOFF,
 		U_LIGHT1_COSINNER,
 		U_LIGHT1_EXPONENT,
+
+		//lamp lights
+		U_LIGHT2_POSITION,
+		U_LIGHT2_COLOR,
+		U_LIGHT2_POWER,
+		U_LIGHT2_KC,
+		U_LIGHT2_KL,
+		U_LIGHT2_KQ,
+		U_LIGHT2_TYPE,
+		U_LIGHT2_SPOTDIRECTION,
+		U_LIGHT2_COSCUTOFF,
+		U_LIGHT2_COSINNER,
+		U_LIGHT2_EXPONENT,
+
+		//TV lights
+		U_LIGHT3_POSITION,
+		U_LIGHT3_COLOR,
+		U_LIGHT3_POWER,
+		U_LIGHT3_KC,
+		U_LIGHT3_KL,
+		U_LIGHT3_KQ,
+		U_LIGHT3_TYPE,
+		U_LIGHT3_SPOTDIRECTION,
+		U_LIGHT3_COSCUTOFF,
+		U_LIGHT3_COSINNER,
+		U_LIGHT3_EXPONENT,
 
 		U_NUMLIGHTS,
 		U_COLOR_TEXTURE_ENABLED,
@@ -144,9 +173,9 @@ public:
 	SceneHome();
 	~SceneHome();
 
+	void UseScene();
 	void Init();
 	void TransferGameInfo(Game* game);
-	void UseScene();
 	void Update(double dt);
 	void Reset();
 	void Render();

@@ -112,6 +112,7 @@ public:
 	SceneTemplate();
 	~SceneTemplate();
 
+	void UseScene();
 	void Init();
 	void TransferGameInfo(Game* game);
 	void Update(double dt);

@@ -86,7 +86,8 @@ class SceneFinal : public Scene
 public:
 	SceneFinal();
 	~SceneFinal();
-
+	
+	void UseScene();
 	void Init();
 	void TransferGameInfo(Game* game);
 	void Update(double dt);
